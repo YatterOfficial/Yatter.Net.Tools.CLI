@@ -10,6 +10,12 @@ Copyright © 2021
 
 ## Yatter Content-Management CLI (dotnet tool)
 
+### Installation
+
+- ```dotnet tool install --global Yatter.Net.Tools.CLI --version 0.0.2```
+
+### Overview
+
 This solution is a dotnet tool that is released as a Nuget package (```Yatter.Net.Tools.CLI```) that can be installed using the dotnet CLI, which executes from the cli as ```yatter <service> (arguments)```.
 
 Presently, the cli's capability is:
