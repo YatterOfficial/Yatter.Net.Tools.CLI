@@ -34,6 +34,13 @@ Presently, the cli's capability is:
   - ```-f``` (```--filename```), mandatory, the input or output filename, depending upon whether packing (-p (--pack)) or unpacking (-u (--unpack).
   - ```-v``` (```--verbose```), optional, instructs the CLI to make verbose CLI comments as it executes.
 
+## Local
+
+When cloning and building locally from the cloned root directory, the following CLI commands can be used to insall, and uninstall:
+
+- ```dotnet tool install --global --add-source ./nupkg Yatter.Net.Tools.CLI```
+- ```dotnet tool uninstall -g Yatter.Net.Tools.CLI```
+
 
 
 
