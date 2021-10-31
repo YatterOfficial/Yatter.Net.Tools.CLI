@@ -8,6 +8,12 @@ Copyright © 2021
 
 # Yatter.Net.Tools.CLI
 
+<a href="https://www.nuget.org/packages/Yatter.Net.Tools.CLI/" target="_blank" rel="noreferrer noopener"><img alt="Nuget" src="https://img.shields.io/nuget/v/Yatter.Net.Tools.CLI?color=blue&style=for-the-badge"></a>
+
+![GitHub](https://img.shields.io/github/license/yatterofficial/Yatter.Net.Tools.CLI?style=for-the-badge)
+
+[![Yatter.Net.Tools.CLI on fuget.org](https://www.fuget.org/packages/Yatter.Net.Tools.CLI/badge.svg)](https://www.fuget.org/packages/Yatter.Net.Tools.CLI)
+
 ## Yatter Content-Management CLI (dotnet tool)
 
 ### Installation
