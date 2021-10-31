@@ -31,7 +31,7 @@ Presently, the cli's capability is:
 - ```-u``` (```--unpack```), NOT YET IMPLEMENTED - optional, however one of ```-p``` (```--pack```) or ```-u``` (```--unpack```) must be specified; instructs the CLI to unpack a Yatter archive into the current directory
 - ```-a``` (```--yatra```), optional, however one of ```-a``` (```--yatra```) or ```-z``` (```--yatrz```) must be specified; instructs the CLI to archive ```.yatr``` files in the current directory, into a lightweight archive with the file extention ```.yatra```. Files are converted to Base64 and stored with their relative path's in a ```Document``` of Type ```Yatter.UI.ListBuilder.Serialization.Archives.Document```, which are collectively stored in a ```Magazine``` of Type ```Yatter.UI.ListBuilder.Serialization.Archives.Magazine```, then serialised into ```Yatter Object Notation (YON)``` - a subset of ```JSON``` - and then saved in a file with the file extension ```.yatra```
 - ```-z``` (```--yatrz```), NOT YET IMPLEMENTED - optional, however one of ```-a``` (```--yatra```) or ```-z``` (```--yatrz```) must be specified; instructs the Yatter CLI to recursively archive Yatter documents in a ZIP file with the file extension ```.yatrz```, which contains a Manifest of the archived contents.
-- ```-f``` (```--filename```), mandatory, the output filename.
+- ```-f``` (```--filename```), mandatory, the input or output filename, depending upon whether packing (-p (--pack)) or unpacking (-u (--unpack).
 - ```-v``` (```--verbose```), optional, instructs the CLI to make verbose CLI comments as it executes.
 
 
