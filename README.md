@@ -34,6 +34,7 @@ Presently, the cli's capability is:
   - ```-f``` (```--filename```), mandatory, the input or output filename, depending upon whether packing (-p (--pack)) or unpacking (-u (--unpack).
   - ```-v``` (```--verbose```), optional, instructs the CLI to make verbose CLI comments as it executes.
   - ```-r``` (```--root```), mandatory, instructs the CLI to assign a path to the archive ```PathRoot``` property, indicating where it will be unpacked to. As this can be assigned later in any workflow, the minimum assignment should be ```-r null``` or ```--root null```, which will artificially assign ```"PathRoot" :  "null"``` to the archive's YON ```Yatter.UI.ListBuilder.Serialization.Archives.Magazine.PathRoot``` property.
+  - ```-h``` (```--help```), optional, instructs the CLI to display the Help Screen
 
 ## Local
 
