@@ -3,7 +3,7 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net6.0</TargetFramework>
-    <PackageVersion>0.0.2</PackageVersion>
+    <PackageVersion>0.0.3</PackageVersion>
     <Authors>Anthony Harrison</Authors>
     <Copyright>Anthony Harrison</Copyright>
     <PackageIconUrl>https://avatars.githubusercontent.com/u/92665945</PackageIconUrl>
@@ -13,7 +13,7 @@
     <Owners>Anthony Harrison</Owners>
     <PackageProjectUrl>https://github.com/YatterOfficial/Yatter.Net.Tools.CLI</PackageProjectUrl>
     <PackageIcon>icon.png</PackageIcon>
-    <PackageReleaseNotes>Alpha Release.</PackageReleaseNotes>
+    <PackageReleaseNotes>Alpha Release. Added -r (--root) to microsite cli options.</PackageReleaseNotes>
     <Summary>Yatter CLI for the automation of Yatter Content-Creation</Summary>
     <PackageTags>dotnet-new;tool;yatter</PackageTags>
     <Title>Yatter Dotnet CLI</Title>

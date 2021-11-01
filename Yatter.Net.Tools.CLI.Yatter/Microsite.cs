@@ -24,6 +24,8 @@ namespace Yatter.Net.Tools.CLI.Yatter
             bool yatra = false;
             bool yatrz = false;
             bool customfilename = false;
+            bool root = false;
+            string rootpath = string.Empty;
             string filename = string.Empty;
             bool verbose = false;
 
@@ -49,6 +51,39 @@ namespace Yatter.Net.Tools.CLI.Yatter
                     yatrz = true;
                 }
 
+                if (args[x].Equals("-r") || args[x].Equals("--root"))
+                {
+                    root = true;
+
+                    if (x + 1 < args.Length)
+                    {
+                        if (args[x + 1] != "-p" &&
+                            args[x + 1] != "-pack" &&
+                            args[x + 1] != "-a" &&
+                            args[x + 1] != "--yatra" &&
+                            args[x + 1] != "-z" &&
+                            args[x + 1] != "--yatrz" &&
+                            args[x + 1] != "-r" &&
+                            args[x + 1] != "--root" &&
+                            args[x + 1] != "-f" &&
+                            args[x + 1] != "--filename"
+                            )
+                        {
+                            rootpath = args[x + 1];
+                        }
+                        else
+                        {
+                            isError = 1;
+                            messages.Add($"Exiting: {args[x]} specified but no root path follows it");
+                        }
+                    }
+                    else
+                    {
+                        isError = 1;
+                        messages.Add($"Exiting: {args[x]} specified but no root path follows it");
+                    }
+                }
+
                 if (args[x].Equals("-f") || args[x].Equals("--filename"))
                 {
                     customfilename = true;
@@ -60,7 +95,9 @@ namespace Yatter.Net.Tools.CLI.Yatter
                             args[x + 1] != "-a" &&
                             args[x + 1] != "--yatra" &&
                             args[x + 1] != "-z" &&
-                            args[x + 1] != "-yatrz" &&
+                            args[x + 1] != "--yatrz" &&
+                            args[x + 1] != "-r" &&
+                            args[x + 1] != "--root" &&
                             args[x + 1] != "-f" &&
                             args[x + 1] != "--filename"
                             )
@@ -118,6 +155,12 @@ namespace Yatter.Net.Tools.CLI.Yatter
                 }
             }
 
+            if(string.IsNullOrEmpty(rootpath))
+            {
+                isError = 1;
+                messages.Add($"Exiting: You must specify a -r (--root) path where the archive can be unpacked ... or specify -r null");
+            }
+
             if (yatra && yatrz)
             {
                 isError = 1;
@@ -130,12 +173,12 @@ namespace Yatter.Net.Tools.CLI.Yatter
                 {
                     if (yatra)
                     {
-                        isError = await Pack(PackingType.yatra, filename, currentDirectory, verbose);
+                        isError = await Pack(PackingType.yatra, filename, rootpath, currentDirectory, verbose);
                     }
 
                     if (yatrz)
                     {
-                        isError = await Pack(PackingType.yatrz, filename, currentDirectory, verbose);
+                        isError = await Pack(PackingType.yatrz, filename, rootpath, currentDirectory, verbose);
                     }
                 }
                 else
@@ -156,7 +199,7 @@ namespace Yatter.Net.Tools.CLI.Yatter
             return isError;
         }
 
-        private static async Task<int> Pack(PackingType packingType, string filename, string currentDirectory, bool verbose)
+        private static async Task<int> Pack(PackingType packingType, string filename, string rootPath, string currentDirectory, bool verbose)
         {
             int response = 0;
             if(packingType==PackingType.yatra)
@@ -167,7 +210,7 @@ namespace Yatter.Net.Tools.CLI.Yatter
                     Console.WriteLine("Proceeding to pack lightweight archive with file extension .yatra");
                     Console.ResetColor();
                 }
-                response = await PackLightweight(filename, currentDirectory, verbose);
+                response = await PackLightweight(filename, rootPath, currentDirectory, verbose);
             }
             else if(packingType==PackingType.yatrz)
             {
@@ -177,7 +220,7 @@ namespace Yatter.Net.Tools.CLI.Yatter
                     Console.WriteLine("Proceeding to pack zip archive with file extension .yatrz");
                     Console.ResetColor();
                 }
-                response = PackZip(filename, currentDirectory, verbose);
+                response = PackZip(filename, rootPath, currentDirectory, verbose);
             }
             else
             {
@@ -190,11 +233,11 @@ namespace Yatter.Net.Tools.CLI.Yatter
             return response;
         }
 
-        private static async Task<int> PackLightweight(string filename, string currentDirectory, bool verbose)
+        private static async Task<int> PackLightweight(string filename, string rootPath, string currentDirectory, bool verbose)
         {
             int response = 0;
 
-            var magazine = new Magazine();
+            var magazine = new Magazine() { PathRoot = rootPath };
 
             List<string> rawPaths = new List<string>();
             List<string> filenames = new List<string>();
@@ -278,7 +321,7 @@ namespace Yatter.Net.Tools.CLI.Yatter
             return response;
         }
 
-        private static int PackZip(string filename, string currentDirectory, bool verbose)
+        private static int PackZip(string filename, string rootPath, string currentDirectory, bool verbose)
         {
             int response = 0;
 
