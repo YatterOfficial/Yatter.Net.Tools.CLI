@@ -40,6 +40,7 @@ namespace Yatter.Net.Tools.CLI
             else if(args[0].Equals("microsite"))
             {
                 currentExecutionModule = "microsite";
+
                 response = await Microsite.Run(args, System.Environment.CurrentDirectory);
             }
             else

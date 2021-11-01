@@ -20,6 +20,7 @@ namespace Yatter.Net.Tools.CLI.Yatter
             int isError = 0;
             var messages = new List<string>();
 
+            bool help = false;
             bool pack = false;
             bool yatra = false;
             bool yatrz = false;
@@ -31,6 +32,11 @@ namespace Yatter.Net.Tools.CLI.Yatter
 
             for (int x = 0; x < args.Length; x++)
             {
+                if (args[x].Equals("-h") || args[x].Equals("--help"))
+                {
+                    help = true;
+                }
+
                 if (args[x].Equals("-p") || args[x].Equals("--pack"))
                 {
                     pack = true;
@@ -169,22 +175,29 @@ namespace Yatter.Net.Tools.CLI.Yatter
 
             if (isError == 0)
             {
-                if (pack)
+                if (help)
                 {
-                    if (yatra)
-                    {
-                        isError = await Pack(PackingType.yatra, filename, rootpath, currentDirectory, verbose);
-                    }
-
-                    if (yatrz)
-                    {
-                        isError = await Pack(PackingType.yatrz, filename, rootpath, currentDirectory, verbose);
-                    }
+                    PrintHelp();
                 }
                 else
-                {
-                    isError = 1;
-                    messages.Add($"Exiting as -p (--pack) was not specified");
+                { 
+                    if (pack)
+                    {
+                        if (yatra)
+                        {
+                            isError = await Pack(PackingType.yatra, filename, rootpath, currentDirectory, verbose);
+                        }
+
+                        if (yatrz)
+                        {
+                            isError = await Pack(PackingType.yatrz, filename, rootpath, currentDirectory, verbose);
+                        }
+                    }
+                    else
+                    {
+                        isError = 1;
+                        messages.Add($"Exiting as -p (--pack) was not specified");
+                    }
                 }
             }
 
@@ -197,6 +210,45 @@ namespace Yatter.Net.Tools.CLI.Yatter
 
 
             return isError;
+        }
+
+        private static void PrintHelp()
+        {
+            string help = @"
+Yatter Content-Management CLI (dotnet tool)
+Author: Anthony Harrison
+Description: A Content Management Tool for using Yatter Object Notation (YON)
+
+Current Primary Service Indicators: microsite
+
+Example:
+
+  yatter microsite -p -a -f ""Magazine.yatra"" -r ""users/__UserMicrositeRootGuid__/site/""
+
+Options:
+
+  microsite Primary Service Indicator, one Primary Service Indicator is Required                         
+
+  -p|--pack 'microsite' Primary Service Indicator packing switch, optional, however one of -p (--pack) or -u (--unpack) must be specified; instructs the CLI to pack a Yatter Microsite from the current directory
+
+  -u|--unpack 'microsite' Primary Service Indicator unpacking switch (NOT IMPLEMENTED), optional, however one of -p (--pack) or -u (--unpack) must be specified; instructs the CLI to unpackpack a Yatter Microsite from the current directory
+
+  -a|--yatra 'microsite' Primary Service Indicator lightweight archiving switch, optional, however one of -a (--yatra) or -z (--yatrz) must be specified; instructs the CLI to archive .yatr files in the current directory, into a lightweight archive with the file extention .yatra. Files are converted to Base64 and stored with their relative path's in a Document of Type Yatter.UI.ListBuilder.Serialization.Archives.Document, which are collectively stored in a Magazine of Type Yatter.UI.ListBuilder.Serialization.Archives.Magazine, then serialised into Yatter Object Notation (YON) - a subset of JSON - and then saved in a file with the file extension .yatra               
+
+  -z|--yatrz 'microsite' Primary Service Indicator lightweight archiving switch (NOT IMPLEMENTED), optional, however one of -a (--yatra) or -z (--yatrz) must be specified; instructs the Yatter CLI to recursively archive Yatter documents in a ZIP file with the file extension .yatrz, which contains a Manifest of the archived contents.
+
+  -f|--filename 'microsite' Primary Service Indicator filename switch, mandatory, the input or output filename, depending upon whether packing (-p (--pack)) or unpacking (-u (--unpack).
+
+  -r|--root  'microsite' Primary Service Indicator RootPath switch, mandatory,  instructs the CLI to assign a path to the archive PathRoot property, indicating where it will be unpacked to. As this can be assigned later in any workflow, the minimum assignment should be -r null or --root null, which will artificially assign ""PathRoot"" : ""null"" to the archive's YON Yatter.UI.ListBuilder.Serialization.Archives.Magazine.PathRoot property.
+
+(General)
+
+  -v|verbose optional, instructs the CLI to make verbose CLI comments as it executes.
+
+  -h|--help optional, instructs the CLI to display this Help Screen
+";
+
+            Console.WriteLine(help);
         }
 
         private static async Task<int> Pack(PackingType packingType, string filename, string rootPath, string currentDirectory, bool verbose)
