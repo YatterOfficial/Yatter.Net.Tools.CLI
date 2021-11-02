@@ -18,7 +18,14 @@ Copyright © 2021
 
 ### Installation
 
+#### Global
+
 - ```dotnet tool install --global Yatter.Net.Tools.CLI --version 0.0.6```
+
+#### Local
+
+- ```dotnet new tool-manifest # if you are setting up this repo```
+- ```dotnet tool install --local Yatter.Net.Tools.CLI --version 0.0.6```
 
 ### Overview
 
