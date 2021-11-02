@@ -2,7 +2,7 @@
 
 It's a winding road to Camelot so please read the [YatterOfficial](https://github.com/yatterofficial) Overview and Raison d'être.
 
-y@R and You-At-A-Resource are trademarks of Count Anthony Harrison, operating from the United Kingdom
+y@R and You-At-A-Resource are trademarks of Count Anthony Harrison, operating from Cumberland in the United Kingdom
 
 Copyright © 2021
 
