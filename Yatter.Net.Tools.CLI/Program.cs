@@ -12,7 +12,7 @@ namespace Yatter.Net.Tools.CLI
 
         static async Task<int> Main(string[] args)
         {
-            string versionString = "0.0.5";
+            string versionString = "0.0.6";
 
             string currentExecutionModule = string.Empty;
 

@@ -6,7 +6,7 @@ namespace Yatter.Net.Tools.CLI.Yatter
         public static int Run(string versionString)
         {
             Console.WriteLine("Yatter Content-Management CLI (dotnet tool)");
-            Console.WriteLine($"yatter v{versionString}");
+            Console.WriteLine($"v{versionString}");
             Console.WriteLine("Author: Anthony Harrison");
             Console.WriteLine("-------------");
             Console.WriteLine("\nUsage:");

@@ -96,6 +96,7 @@ namespace Yatter.Net.Tools.CLI.Yatter
             var messages = new List<string>();
 
             bool pack = false;
+            bool unpack = false;
             bool yatra = false;
             bool yatrz = false;
             bool customfilename = false;
@@ -109,6 +110,11 @@ namespace Yatter.Net.Tools.CLI.Yatter
                 if (args[x].Equals("-p") || args[x].Equals("--pack"))
                 {
                     pack = true;
+                }
+
+                if (args[x].Equals("-u") || args[x].Equals("--unpack"))
+                {
+                    unpack = true;
                 }
 
                 if (args[x].Equals("-v") || args[x].Equals("--verbose"))
@@ -230,7 +236,7 @@ namespace Yatter.Net.Tools.CLI.Yatter
                 }
             }
 
-            if(string.IsNullOrEmpty(rootpath))
+            if(pack&&string.IsNullOrEmpty(rootpath))
             {
                 isError = 1;
                 messages.Add($"Exiting: You must specify a -r (--root) path where the archive can be unpacked ... or specify -r null");
@@ -256,10 +262,14 @@ namespace Yatter.Net.Tools.CLI.Yatter
                         isError = await Pack(PackingType.yatrz, filename, rootpath, currentDirectory, verbose);
                     }
                 }
+                else if (unpack)
+                {
+                    isError = await Unpack(filename, currentDirectory, verbose);
+                }
                 else
                 {
                     isError = 1;
-                    messages.Add($"Exiting as -p (--pack) was not specified");
+                    messages.Add($"Exiting: Either -p (--pack) or -u (--unpack) must be specified.");
                 }
             }
 
@@ -271,6 +281,148 @@ namespace Yatter.Net.Tools.CLI.Yatter
             Console.ResetColor();
 
             return isError;
+        }
+
+        private async static Task<int> Unpack(string filename, string currentDirectory, bool verbose)
+        {
+            int response = 0;
+
+            if(string.IsNullOrEmpty(filename))
+            {
+                response = 1;
+
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine($"Exiting: Filename is empty, please specifiy -f [filename]");
+                Console.ResetColor();
+
+                return response;
+            }
+
+
+            if(!System.IO.File.Exists(Path.Combine(currentDirectory, filename)))
+            {
+                response = 1;
+
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine($"Exiting: File does not exist: {Path.Combine(currentDirectory, filename)}");
+                Console.ResetColor();
+
+                return response;
+            }
+
+            var extension = filename.Substring(filename.Length - 5);
+
+            if(extension.Equals("yatra"))
+            {
+                var filecontents = await System.IO.File.ReadAllTextAsync(Path.Combine(currentDirectory, filename));
+
+                if(string.IsNullOrEmpty(filecontents))
+                {
+                    response = 1;
+
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine($"Exiting: File content is empty at {Path.Combine(currentDirectory, filename)}");
+                    Console.ResetColor();
+
+                    return response;
+                }
+
+                if (verbose)
+                {
+                    Console.ForegroundColor = ConsoleColor.DarkYellow;
+                    Console.WriteLine();
+                    Console.WriteLine($"{filename} Magazine Contents:");
+                    Console.WriteLine(filecontents);
+                    Console.WriteLine();
+                    Console.ResetColor();
+                }
+
+                var magazine = JsonConvert.DeserializeObject<Magazine>(filecontents);
+
+                if(magazine!=null)
+                {
+                    if(magazine.Documents!=null&&magazine.Documents.Count>0)
+                    {
+                        foreach(var document in magazine.Documents)
+                        {
+                            var contents = Base64Decode(document.Base64Content);
+
+                            if(verbose)
+                            {
+                                Console.ForegroundColor = ConsoleColor.DarkYellow;
+                                Console.WriteLine();
+                                Console.WriteLine($"Path: {Path.Combine(currentDirectory, document.Path)}");
+                                Console.WriteLine(contents);
+                                Console.WriteLine();
+                                Console.ResetColor();
+                            }
+
+                            try
+                            {
+                                await System.IO.File.WriteAllTextAsync(Path.Combine(currentDirectory, document.Path), contents);
+                            }
+                            catch(Exception ex)
+                            {
+                                Console.ForegroundColor = ConsoleColor.Red;
+                                Console.WriteLine($"Exiting: Exception whilst writing {Path.Combine(currentDirectory, document.Path)} with Message: [{ex.Message}]  ");
+                                Console.ResetColor();
+                                response = 1;
+
+                                return response;
+                            }
+                        }
+
+                            Console.WriteLine();
+                            Console.WriteLine($"Documents Unpacked from {Path.Combine(currentDirectory, filename)}:");
+                            foreach (var document in magazine.Documents)
+                            {
+                                Console.WriteLine($"{document.Path}");
+                            }
+                            Console.WriteLine();
+
+                    }
+                    else
+                    {
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.WriteLine($"Exiting: Magazine does not contain any Documents.");
+                        Console.ResetColor();
+
+                        response = 1;
+
+                        return response;
+                    }
+                }
+                else
+                {
+                    response = 1;
+
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine($"Exiting: Magazine is null in {Path.Combine(currentDirectory, filename)}.");
+                    Console.ResetColor();
+
+                    return response;
+                }
+            }
+            else if (extension.Equals("yatrz"))
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine($"Exiting: Unpacking .yatrz files is not implemented.");
+                Console.ResetColor();
+                response = 1;
+
+                return response;
+            }
+            else
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine($"Exiting: Unsupported file extension {extension}.");
+                Console.ResetColor();
+                response = 1;
+
+                return response;
+            }
+
+            return response;
         }
 
         private static async Task<int> Pack(PackingType packingType, string filename, string rootPath, string currentDirectory, bool verbose)
@@ -388,9 +540,19 @@ namespace Yatter.Net.Tools.CLI.Yatter
             {
                 Console.Write($"[{file}]");
             }
+            Console.WriteLine();
             Console.WriteLine($" as Base64 in a respective Document of Type {typeof(Document)}, thereso describing each one's respective path, then archived each of those Documents in a single Magazine of Type {typeof(Magazine)} and saved that Magazine in Yatter Object Notation (YON) format - a subset of JSON - in file {Path.Combine(currentDirectory, filename)}");
-
             Console.ResetColor();
+
+            Console.WriteLine();
+            Console.WriteLine($"Documents Packed into {Path.Combine(currentDirectory, filename)} lightweight archive:");
+            foreach (var document in magazine.Documents)
+            {
+                Console.WriteLine($"{document.Path}");
+            }
+            Console.WriteLine();
+            Console.WriteLine($"Output: .yatra lightweight archive generated at {Path.Combine(currentDirectory, filename)}");
+            Console.WriteLine();
 
             return response;
         }

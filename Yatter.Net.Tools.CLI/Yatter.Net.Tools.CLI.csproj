@@ -3,7 +3,7 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net6.0</TargetFramework>
-    <PackageVersion>0.0.5</PackageVersion>
+    <PackageVersion>0.0.6</PackageVersion>
     <Authors>Anthony Harrison</Authors>
     <Copyright>Anthony Harrison</Copyright>
     <PackageIconUrl>https://avatars.githubusercontent.com/u/92665945</PackageIconUrl>
@@ -13,7 +13,7 @@
     <Owners>Anthony Harrison</Owners>
     <PackageProjectUrl>https://github.com/YatterOfficial/Yatter.Net.Tools.CLI</PackageProjectUrl>
     <PackageIcon>icon.png</PackageIcon>
-    <PackageReleaseNotes>Alpha Release. Changed Help mechanism to use Microsoft's System.CommandLine.</PackageReleaseNotes>
+    <PackageReleaseNotes>Alpha Release. Added unpacking for .yatra lightweight archives.</PackageReleaseNotes>
     <Summary>Yatter CLI for the automation of Yatter Content-Creation</Summary>
     <PackageTags>dotnet-new;tool;yatter</PackageTags>
     <Title>Yatter Dotnet CLI</Title>
