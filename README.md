@@ -22,7 +22,7 @@ Copyright © 2021
 
 ### Overview
 
-This solution is a dotnet tool that is released as a Nuget package (```Yatter.Net.Tools.CLI```) that can be installed using the dotnet CLI, which executes from the cli as ```yatter <service> (arguments)```.
+This solution is a dotnet tool that is released as a Nuget package (```Yatter.Net.Tools.CLI```) that can be installed using the dotnet CLI, which executes from the cli as ```yatter [command] [options]```.
 
 Presently, the cli's capability is:
 
