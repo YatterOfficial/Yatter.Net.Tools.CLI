@@ -69,4 +69,4 @@ n.b. Prior to calling the above install line, you must have built the project an
 
 In Visual Studio, just select the ```Yatter.Net.Tools.CLI``` project, right-click, and select ```Create Nuget Package```.
 
-
+The Nuget package is created in the ```./nupkg``` directory.
