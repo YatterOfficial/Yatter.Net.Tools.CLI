@@ -7,8 +7,10 @@
 
   <ItemGroup>
     <None Remove="Yatter.UI.ListBuilder.Serialization" />
+    <None Remove="System.CommandLine" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Yatter.UI.ListBuilder.Serialization" Version="0.0.8" />
+    <PackageReference Include="System.CommandLine" Version="2.0.0-beta1.21308.1" />
   </ItemGroup>
 </Project>

@@ -3,7 +3,7 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net6.0</TargetFramework>
-    <PackageVersion>0.0.4</PackageVersion>
+    <PackageVersion>0.0.5</PackageVersion>
     <Authors>Anthony Harrison</Authors>
     <Copyright>Anthony Harrison</Copyright>
     <PackageIconUrl>https://avatars.githubusercontent.com/u/92665945</PackageIconUrl>
@@ -13,7 +13,7 @@
     <Owners>Anthony Harrison</Owners>
     <PackageProjectUrl>https://github.com/YatterOfficial/Yatter.Net.Tools.CLI</PackageProjectUrl>
     <PackageIcon>icon.png</PackageIcon>
-    <PackageReleaseNotes>Alpha Release. Added -h (--help) to general cli options.</PackageReleaseNotes>
+    <PackageReleaseNotes>Alpha Release. Changed Help mechanism to use Microsoft's System.CommandLine.</PackageReleaseNotes>
     <Summary>Yatter CLI for the automation of Yatter Content-Creation</Summary>
     <PackageTags>dotnet-new;tool;yatter</PackageTags>
     <Title>Yatter Dotnet CLI</Title>
@@ -24,7 +24,7 @@
     <PackAsTool>true</PackAsTool>
     <ToolCommandName>yatter</ToolCommandName>
     <PackageOutputPath>./nupkg</PackageOutputPath>
-    <RootNamespace>Yatter.Net.Tools.CLI "filename.yatrz"</RootNamespace>
+    <RootNamespace>Yatter.Net.Tools.CLI</RootNamespace>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -32,10 +32,16 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="System.CommandLine" />
+  </ItemGroup>
+  <ItemGroup>
     <None Include="icon.png" Pack="true" PackagePath="\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Yatter.Net.Tools.CLI.Yatter\Yatter.Net.Tools.CLI.Yatter.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="System.CommandLine" Version="2.0.0-beta1.21308.1" />
   </ItemGroup>
 </Project>
 

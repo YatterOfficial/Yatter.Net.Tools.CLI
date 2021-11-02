@@ -12,8 +12,7 @@ namespace Yatter.Net.Tools.CLI
 
         static async Task<int> Main(string[] args)
         {
-
-            string versionString = "0.0.1";
+            string versionString = "0.0.5";
 
             string currentExecutionModule = string.Empty;
 
@@ -56,6 +55,12 @@ namespace Yatter.Net.Tools.CLI
                 }
                 Console.WriteLine();
                 Console.ResetColor();
+                Console.WriteLine("Try:");
+                Console.WriteLine(" yatter [enter]");
+                Console.WriteLine(" yatter microsite --help [enter]");
+                Console.WriteLine();
+
+
             }
 
             if(response==1)
