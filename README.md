@@ -31,6 +31,8 @@ Copyright © 2021
 
 This solution is a dotnet tool that is released as a Nuget package (```Yatter.Net.Tools.CLI```) that can be installed using the dotnet CLI, which executes from the cli as ```yatter [command] [options]```.
 
+The nuget package is created into the ```./nupkg``` directory.
+
 Presently, the cli's capability is:
 
 ```
