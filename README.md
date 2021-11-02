@@ -18,7 +18,7 @@ Copyright © 2021
 
 ### Installation
 
-- ```dotnet tool install --global Yatter.Net.Tools.CLI --version 0.0.5```
+- ```dotnet tool install --global Yatter.Net.Tools.CLI --version 0.0.6```
 
 ### Overview
 
