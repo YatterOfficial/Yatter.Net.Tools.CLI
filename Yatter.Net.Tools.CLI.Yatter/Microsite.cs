@@ -36,7 +36,7 @@ namespace Yatter.Net.Tools.CLI.Yatter
 
             var unpack = new Option<bool>("--unpack");
             unpack.AddAlias("-u");
-            unpack.Description = "The microsite command's unpacking switch (NOT IMPLEMENTED), optional, however one of -p (--pack) or -u (--unpack) must be specified; instructs the CLI to unpackpack a Yatter Microsite from the current directory";
+            unpack.Description = "The microsite command's unpacking switch (NOT IMPLEMENTED), optional, however one of -p (--pack) or -u (--unpack) must be specified; instructs the CLI to unpack a Yatter Microsite from the current directory";
             microsite.AddOption(unpack);
 
             var yatra = new Option<bool>("--yatra");
