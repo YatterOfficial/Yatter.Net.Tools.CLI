@@ -63,6 +63,8 @@ When cloning and building locally from the cloned root directory, the following 
 - ```dotnet tool install --global --add-source ./nupkg Yatter.Net.Tools.CLI```
 - ```dotnet tool uninstall -g Yatter.Net.Tools.CLI```
 
+n.b. Prior to calling the above install line, you must have built the project and generated the Nuget package.
 
+In Visual Studio, just select the ```Yatter.Net.Tools.CLI``` project, right-click, and select ```Create Nuget Package```.
 
 
