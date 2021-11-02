@@ -58,7 +58,7 @@ Options:
 
 ## Local
 
-When cloning and building locally from the cloned root directory, the following CLI commands can be used to insall, and uninstall:
+When cloning and building locally from the cloned root directory, the following CLI commands can be used to install, and uninstall:
 
 - ```dotnet tool install --global --add-source ./nupkg Yatter.Net.Tools.CLI```
 - ```dotnet tool uninstall -g Yatter.Net.Tools.CLI```
