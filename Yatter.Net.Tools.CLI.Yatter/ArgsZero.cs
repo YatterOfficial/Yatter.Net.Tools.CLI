@@ -18,6 +18,10 @@ namespace Yatter.Net.Tools.CLI.Yatter
             Console.WriteLine("  yatter microsite [options]");
             Console.WriteLine("  yatter microsite --help");
             Console.WriteLine();
+            Console.WriteLine(" cryptography");
+            Console.WriteLine("  yatter cryptography [options]");
+            Console.WriteLine("  yatter cryptography --help");
+            Console.WriteLine();
             Console.WriteLine("-------------");
 
             return 0;

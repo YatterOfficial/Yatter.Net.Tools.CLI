@@ -12,12 +12,13 @@ namespace Yatter.Net.Tools.CLI
 
         static async Task<int> Main(string[] args)
         {
-            string versionString = "0.0.6";
+            string versionString = "0.0.7";
 
             string currentExecutionModule = string.Empty;
 
             List<string> primaryarguments = new List<string>();
             primaryarguments.Add("microsite");
+            primaryarguments.Add("cryptography");
 
             Console.ForegroundColor = ConsoleColor.Green;
             Console.Write($"Executing yatter ");
@@ -42,6 +43,12 @@ namespace Yatter.Net.Tools.CLI
 
                 response = await Microsite.Run(args, System.Environment.CurrentDirectory);
             }
+            else if (args[0].Equals("cryptography"))
+            {
+                currentExecutionModule = "cryptography";
+
+                response = await Cryptography.Run(args, System.Environment.CurrentDirectory);
+            }
             else
             {
                 response = 1;
@@ -58,6 +65,7 @@ namespace Yatter.Net.Tools.CLI
                 Console.WriteLine("Try:");
                 Console.WriteLine(" yatter [enter]");
                 Console.WriteLine(" yatter microsite --help [enter]");
+                Console.WriteLine(" yatter cryptography --help [enter]");
                 Console.WriteLine();
 
 
