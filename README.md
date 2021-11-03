@@ -18,11 +18,20 @@ Copyright © 2021
 
 ### Installation
 
-- ```dotnet tool install --global Yatter.Net.Tools.CLI --version 0.0.5```
+#### Global
+
+- ```dotnet tool install --global Yatter.Net.Tools.CLI --version 0.0.6```
+
+#### Local
+
+- ```dotnet new tool-manifest # if you are setting up this repo```
+- ```dotnet tool install --local Yatter.Net.Tools.CLI --version 0.0.6```
 
 ### Overview
 
 This solution is a dotnet tool that is released as a Nuget package (```Yatter.Net.Tools.CLI```) that can be installed using the dotnet CLI, which executes from the cli as ```yatter [command] [options]```.
+
+The nuget package is created into the ```./nupkg``` directory.
 
 Presently, the cli's capability is:
 
@@ -35,7 +44,8 @@ Usage:
 
 Options:
   -p, --pack                 The microsite command's packing switch, optional, however one of -p (--pack) or -u (--unpack) must be specified; instructs the CLI to pack a Yatter Microsite from the current directory
-  -u, --unpack               The microsite command's unpacking switch (NOT IMPLEMENTED), optional, however one of -p (--pack) or -u (--unpack) must be specified; instructs the CLI to unpackpack a Yatter Microsite from the current directory
+  -u, --unpack               The microsite command's unpacking switch (.yatra implemented but .yatrz NOT IMPLEMENTED), optional, however one of -p (--pack) or -u (--unpack) must be specified; instructs the CLI to unpack a Yatter Microsite from the 
+                             current directory
   -a, --yatra                The microsite command's lightweight archiving switch, optional, however one of -a (--yatra) or -z (--yatrz) must be specified; instructs the CLI to archive .yatr files in the current directory, into a lightweight archive 
                              with the file extention .yatra. Files are converted to Base64 and stored with their relative path's in a Document of Type Yatter.UI.ListBuilder.Serialization.Archives.Document, which are collectively stored in a Magazine 
                              of Type Yatter.UI.ListBuilder.Serialization.Archives.Magazine, then serialised into Yatter Object Notation (YON) - a subset of JSON - and then saved in a file with the file extension .yatra
@@ -50,11 +60,13 @@ Options:
 
 ## Local
 
-When cloning and building locally from the cloned root directory, the following CLI commands can be used to insall, and uninstall:
+When cloning and building locally from the cloned root directory, the following CLI commands can be used to install, and uninstall:
 
 - ```dotnet tool install --global --add-source ./nupkg Yatter.Net.Tools.CLI```
 - ```dotnet tool uninstall -g Yatter.Net.Tools.CLI```
 
+n.b. Prior to calling the above install line, you must have built the project and generated the Nuget package.
 
+In Visual Studio, just select the ```Yatter.Net.Tools.CLI``` project, right-click, and select ```Create Nuget Package```.
 
-
+The Nuget package is created in the ```./nupkg``` directory.
