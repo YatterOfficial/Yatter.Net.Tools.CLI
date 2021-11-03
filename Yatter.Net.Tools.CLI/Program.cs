@@ -12,6 +12,14 @@ namespace Yatter.Net.Tools.CLI
 
         static async Task<int> Main(string[] args)
         {
+            bool silent = false;
+            for (int x = 0; x < args.Length; x++)
+            {
+                if(args[x].Equals("-s")||args[x].Equals("--silent"))
+                {
+                    silent = true;
+                }
+            }
             string versionString = "0.0.7";
 
             string currentExecutionModule = string.Empty;
@@ -20,16 +28,19 @@ namespace Yatter.Net.Tools.CLI
             primaryarguments.Add("microsite");
             primaryarguments.Add("cryptography");
 
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.Write($"Executing yatter ");
-
-            for(int x = 0; x < args.Length; x++)
+            if (!silent)
             {
-                Console.Write($"{args[x]} ");
-            }
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.Write($"Executing yatter ");
 
-            Console.WriteLine($"in {System.Environment.CurrentDirectory}");
-            Console.ResetColor();
+                for (int x = 0; x < args.Length; x++)
+                {
+                    Console.Write($"{args[x]} ");
+                }
+
+                Console.WriteLine($"in {System.Environment.CurrentDirectory}");
+                Console.ResetColor();
+            }
 
             int response = 0;
 
@@ -53,37 +64,45 @@ namespace Yatter.Net.Tools.CLI
             {
                 response = 1;
 
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.Write("Exiting, first <argument> in yatter <argument> ... was not one of ");
-
-                foreach(var primary in primaryarguments)
+                if (!silent)
                 {
-                    Console.Write($"[{primary}]");
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.Write("Exiting, first <argument> in yatter <argument> ... was not one of ");
+
+                    foreach (var primary in primaryarguments)
+                    {
+                        Console.Write($"[{primary}]");
+                    }
+                    Console.WriteLine();
+                    Console.ResetColor();
+                    Console.WriteLine("Try:");
+                    Console.WriteLine(" yatter [enter]");
+                    Console.WriteLine(" yatter microsite --help [enter]");
+                    Console.WriteLine(" yatter cryptography --help [enter]");
+                    Console.WriteLine();
                 }
-                Console.WriteLine();
+            }
+
+            if (!silent)
+            {
+                if (response == 1)
+                {
+                    Console.WriteLine("Failed.");
+                }
+                else
+                {
+                    Console.WriteLine($"Finished executing yatter {currentExecutionModule}");
+                }
+            }
+
+
+            if (!silent)
+            {
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.Write($"Nuget Package Yatter.Net.Tools.CLI::{versionString}, released as open-source under MIT Licence as ");
+                Console.WriteLine($"'Yatter Content-Management CLI (dotnet tool)', Copyright (C) Anthony Harrison 2021");
                 Console.ResetColor();
-                Console.WriteLine("Try:");
-                Console.WriteLine(" yatter [enter]");
-                Console.WriteLine(" yatter microsite --help [enter]");
-                Console.WriteLine(" yatter cryptography --help [enter]");
-                Console.WriteLine();
-
-
             }
-
-            if(response==1)
-            {
-                Console.WriteLine("Failed.");
-            }
-            else
-            {
-                Console.WriteLine($"Finished executing yatter {currentExecutionModule}");
-            }
-
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.Write($"Nuget Package Yatter.Net.Tools.CLI::{versionString}, released as open-source under MIT Licence as ");
-            Console.WriteLine($"'Yatter Content-Management CLI (dotnet tool)', Copyright (C) Anthony Harrison 2021");
-            Console.ResetColor();
 
             return response;
         }

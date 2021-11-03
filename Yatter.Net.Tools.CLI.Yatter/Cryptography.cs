@@ -5,6 +5,8 @@ using System.CommandLine.Builder;
 using System.CommandLine.Invocation;
 using System.CommandLine.Parsing;
 using System.IO;
+using System.Security.Cryptography;
+using System.Text;
 using System.Threading.Tasks;
 using Yatter.Security.Cryptography;
 
@@ -107,6 +109,12 @@ namespace Yatter.Net.Tools.CLI.Yatter
             verbose.Description = "Instructs the CLI to make verbose CLI comments as it executes.";
             command.AddOption(verbose);
 
+            var silent = new Option<bool>("--silent");
+            silent.AddAlias("-s");
+            silent.Description = "Instructs the CLI to suppress all unnecessary comments";
+            command.AddOption(silent);
+
+
             command.Handler = CommandHandler.Create<ParseResult>(async (result) =>
             {
                 await RunActions(args, currentDirectory);
@@ -154,6 +162,7 @@ namespace Yatter.Net.Tools.CLI.Yatter
             string tokenheadervalue = string.Empty;
             string output = string.Empty;
             bool verbose = false;
+            bool silent = false;
 
             for (int x = 0; x < args.Length; x++)
             {
@@ -161,120 +170,119 @@ namespace Yatter.Net.Tools.CLI.Yatter
                 {
                     createkeypair = true;
 
-                    ConsoleWriteVerboseBooleanCommandLineAssignment(args, isError, createkeypair, verbose, x);
+                    ConsoleWriteVerboseBooleanCommandLineAssignment(args, isError, createkeypair, verbose, silent, x);
                 }
 
                 if (args[x].Equals("-p") || args[x].Equals("--publickeyfilename"))
                 {
                     AssignValueIfFollowsOrExit(args, ref isError, messages, ref publickeyfilename, x);
 
-                    ConsoleWriteVerboseStringCommandLineAssignment(args, isError, publickeyfilename, verbose, x);
+                    ConsoleWriteVerboseStringCommandLineAssignment(args, isError, publickeyfilename, verbose, silent, x);
                 }
 
                 if (args[x].Equals("-P") || args[x].Equals("--privatekeyfilename"))
                 {
                     AssignValueIfFollowsOrExit(args, ref isError, messages, ref privatekeyfilename, x);
 
-                    ConsoleWriteVerboseStringCommandLineAssignment(args, isError, privatekeyfilename, verbose, x);
+                    ConsoleWriteVerboseStringCommandLineAssignment(args, isError, privatekeyfilename, verbose, silent, x);
                 }
 
                 if (args[x].Equals("-e") || args[x].Equals("--encrypt"))
                 {
                     encrypt = true;
 
-                    ConsoleWriteVerboseBooleanCommandLineAssignment(args, isError, encrypt, verbose, x);
+                    ConsoleWriteVerboseBooleanCommandLineAssignment(args, isError, encrypt, verbose, silent, x);
                 }
 
                 if (args[x].Equals("-d") || args[x].Equals("--decrypt"))
                 {
                     decrypt = true;
 
-                    ConsoleWriteVerboseBooleanCommandLineAssignment(args, isError, decrypt, verbose, x);
+                    ConsoleWriteVerboseBooleanCommandLineAssignment(args, isError, decrypt, verbose, silent, x);
                 }
 
                 if (args[x].Equals("-t") || args[x].Equals("--textinput"))
                 {
                     AssignValueIfFollowsOrExit(args, ref isError, messages, ref textinput, x);
 
-                    ConsoleWriteVerboseStringCommandLineAssignment(args, isError, textinput, verbose, x);
+                    ConsoleWriteVerboseStringCommandLineAssignment(args, isError, textinput, verbose, silent, x);
                 }
 
                 if (args[x].Equals("-f") || args[x].Equals("--fileinput"))
                 {
                     AssignValueIfFollowsOrExit(args, ref isError, messages, ref fileinput, x);
 
-                    ConsoleWriteVerboseStringCommandLineAssignment(args, isError, fileinput, verbose, x);
+                    ConsoleWriteVerboseStringCommandLineAssignment(args, isError, fileinput, verbose, silent, x);
                 }
 
                 if (args[x].Equals("-k") || args[x].Equals("--key"))
                 {
                     AssignValueIfFollowsOrExit(args, ref isError, messages, ref key, x);
 
-                    ConsoleWriteVerboseStringCommandLineAssignment(args, isError, key, verbose, x);
+                    ConsoleWriteVerboseStringCommandLineAssignment(args, isError, key, verbose, silent, x);
                 }
 
                 if (args[x].Equals("-g") || args[x].Equals("--getpublickey"))
                 {
                     getpublickey = true;
 
-                    ConsoleWriteVerboseBooleanCommandLineAssignment(args, isError, getpublickey, verbose, x);
+                    ConsoleWriteVerboseBooleanCommandLineAssignment(args, isError, getpublickey, verbose, silent, x);
                 }
 
                 if (args[x].Equals("-u") || args[x].Equals("--url"))
                 {
                     AssignValueIfFollowsOrExit(args, ref isError, messages, ref url, x);
 
-                    ConsoleWriteVerboseStringCommandLineAssignment(args, isError, url, verbose, x);
+                    ConsoleWriteVerboseStringCommandLineAssignment(args, isError, url, verbose, silent, x);
                 }
 
                 if (args[x].Equals("-a") || args[x].Equals("--anykeyfilename"))
                 {
                     AssignValueIfFollowsOrExit(args, ref isError, messages, ref anykeyfilename, x);
 
-                    ConsoleWriteVerboseStringCommandLineAssignment(args, isError, anykeyfilename, verbose, x);
+                    ConsoleWriteVerboseStringCommandLineAssignment(args, isError, anykeyfilename, verbose, silent, x);
                 }
 
                 if (args[x].Equals("-n") || args[x].Equals("--dnstxtkey"))
                 {
                     AssignValueIfFollowsOrExit(args, ref isError, messages, ref dnstxtkey, x);
 
-                    ConsoleWriteVerboseStringCommandLineAssignment(args, isError, dnstxtkey, verbose, x);
+                    ConsoleWriteVerboseStringCommandLineAssignment(args, isError, dnstxtkey, verbose, silent, x);
                 }
 
                 if (args[x].Equals("-i") || args[x].Equals("--id"))
                 {
                     AssignValueIfFollowsOrExit(args, ref isError, messages, ref id, x);
 
-                    ConsoleWriteVerboseStringCommandLineAssignment(args, isError, id, verbose, x);
+                    ConsoleWriteVerboseStringCommandLineAssignment(args, isError, id, verbose, silent, x);
                 }
 
                 if (args[x].Equals("-y") || args[x].Equals("--tokenheaderkey"))
                 {
                     AssignValueIfFollowsOrExit(args, ref isError, messages, ref tokenheaderkey, x);
 
-                    ConsoleWriteVerboseStringCommandLineAssignment(args, isError, tokenheaderkey, verbose, x);
+                    ConsoleWriteVerboseStringCommandLineAssignment(args, isError, tokenheaderkey, verbose, silent, x);
                 }
 
                 if (args[x].Equals("-z") || args[x].Equals("--tokenheadervalue"))
                 {
                     AssignValueIfFollowsOrExit(args, ref isError, messages, ref tokenheadervalue, x);
 
-                    ConsoleWriteVerboseStringCommandLineAssignment(args, isError, tokenheadervalue, verbose, x);
+                    ConsoleWriteVerboseStringCommandLineAssignment(args, isError, tokenheadervalue, verbose, silent, x);
                 }
 
                 if (args[x].Equals("-o") || args[x].Equals("--output"))
                 {
                     AssignValueIfFollowsOrExit(args, ref isError, messages, ref output, x);
 
-                    ConsoleWriteVerboseStringCommandLineAssignment(args, isError, output, verbose, x);
+                    ConsoleWriteVerboseStringCommandLineAssignment(args, isError, output, verbose, silent, x);
                 }
 
-                if (args[x].Equals("-v") || args[x].Equals("--verbose"))
+                if (args[x].Equals("-s") || args[x].Equals("--silent"))
                 {
-                    verbose = true;
+                    silent = true;
 
-                    Console.WriteLine(); // Commence verbose after a blank line
-                    ConsoleWriteVerboseBooleanCommandLineAssignment(args, isError, verbose, verbose, x);
+                    ConsoleWriteVerboseBooleanCommandLineAssignment(args, isError, silent, verbose, silent, x);
                 }
             }
 
@@ -369,7 +377,7 @@ namespace Yatter.Net.Tools.CLI.Yatter
                     var privateKeyBytesAsBase64 = Convert.ToBase64String(privateKeyBytes);
                     var publicKeyBytesAsBase64 = Convert.ToBase64String(publicKeyBytes);
 
-                    if(verbose)
+                    if(verbose && !silent)
                     {
                         Console.ForegroundColor = ConsoleColor.DarkYellow;
                         Console.WriteLine();
@@ -382,7 +390,7 @@ namespace Yatter.Net.Tools.CLI.Yatter
 
                     await System.IO.File.WriteAllTextAsync(Path.Combine(currentDirectory, publickeyfilename), publicKeyBytesAsBase64);
 
-                    if(verbose)
+                    if(verbose && !silent)
                     {
                         Console.ForegroundColor = ConsoleColor.DarkYellow;
                         Console.WriteLine($"Public Key written to: {Path.Combine(currentDirectory, publickeyfilename)}");
@@ -391,7 +399,7 @@ namespace Yatter.Net.Tools.CLI.Yatter
 
                     await System.IO.File.WriteAllTextAsync(Path.Combine(currentDirectory, privatekeyfilename), privateKeyBytesAsBase64);
 
-                    if(verbose)
+                    if(verbose && !silent)
                     {
                         Console.ForegroundColor = ConsoleColor.DarkYellow;
                         Console.WriteLine($"Private Key written to: {Path.Combine(currentDirectory, privatekeyfilename)}");
@@ -401,10 +409,209 @@ namespace Yatter.Net.Tools.CLI.Yatter
                 }
                 else if (encrypt)
                 {
+                    var cryptographyKeyManager = new CryptographyKeyManager();
+
+                    if(!string.IsNullOrEmpty(key))
+                    {
+                        string publicKey = string.Empty;
+                        try
+                        {
+                            publicKey = await System.IO.File.ReadAllTextAsync(Path.Combine(currentDirectory, key));
+                        }
+                        catch(System.IO.DirectoryNotFoundException ex)
+                        {
+                            isError = 1;
+
+                            messages.Add($"Exception: System.IO.DirectoryNotFoundException for path {Path.Combine(currentDirectory, key)}");
+                        }
+                        catch(System.IO.FileNotFoundException ex)
+                        {
+                            isError = 1;
+                            messages.Add($"Exception: System.IO.FileNotFoundException for path {Path.Combine(currentDirectory, key)}");
+                        }
+                        catch(Exception ex)
+                        {
+                            isError = 1;
+                            messages.Add($"Exception: General Exception for path {Path.Combine(currentDirectory, key)}, {ex.Message}");
+                        }
+
+                        if (isError != 1 && verbose && !silent)
+                        {
+                            Console.ForegroundColor = ConsoleColor.DarkYellow;
+                            Console.WriteLine($"Public Key Text from {Path.Combine(currentDirectory, key)}: {publicKey}");
+                            Console.ResetColor();
+                        }
+
+                        byte[] publicKeyBytes = System.Convert.FromBase64String(publicKey);
+
+                        if (!string.IsNullOrEmpty(textinput))
+                        {
+                            if (isError != 1 && verbose && !silent)
+                            {
+                                Console.ForegroundColor = ConsoleColor.DarkYellow;
+                                Console.WriteLine($"Text Input from -t (--textinput): {textinput}");
+                                Console.ResetColor();
+                            }
+
+                            await Encrypt(currentDirectory, textinput, output, cryptographyKeyManager, publicKeyBytes, verbose, silent, isError, messages);
+                        }
+                        else if (!string.IsNullOrEmpty(fileinput))
+                        {
+                            string fileinputtext = string.Empty;
+                            try
+                            { 
+                                fileinputtext = await System.IO.File.ReadAllTextAsync(Path.Combine(currentDirectory, fileinput));
+                            }
+                            catch (System.IO.DirectoryNotFoundException ex)
+                            {
+                                isError = 1;
+
+                                messages.Add($"Exception: System.IO.DirectoryNotFoundException for path {Path.Combine(currentDirectory, fileinput)}");
+                            }
+                            catch (System.IO.FileNotFoundException ex)
+                            {
+                                isError = 1;
+                                messages.Add($"Exception: System.IO.FileNotFoundException for path {Path.Combine(currentDirectory, fileinput)}");
+                            }
+                            catch (Exception ex)
+                            {
+                                isError = 1;
+                                messages.Add($"Exception: General Exception for path {Path.Combine(currentDirectory, fileinput)}, {ex.Message}");
+                            }
+
+                            if (isError != 1 && verbose && !silent)
+                            {
+                                Console.ForegroundColor = ConsoleColor.DarkYellow;
+                                Console.WriteLine($"File Input Text from -f (--fileinput): {fileinputtext}");
+                                Console.ResetColor();
+                            }
+
+                            if (isError != 1)
+                            {
+                                await Encrypt(currentDirectory, fileinputtext, output, cryptographyKeyManager, publicKeyBytes, verbose, silent, isError, messages);
+                            }
+                        }
+                        else
+                        {
+                            isError = 1;
+
+                            messages.Add($"Error: one of -t (--textinput) or -f (--fileinput) must be specified.");
+                        }
+
+
+                    }
+                    else
+                    {
+                        isError = 1;
+
+                        messages.Add($"Error: -k (--key) must be specified.");
+                    }
+
+
 
                 }
                 else if (decrypt)
                 {
+
+                    var cryptographyKeyManager = new CryptographyKeyManager();
+
+                    if (!string.IsNullOrEmpty(key))
+                    {
+                        string privateKey = string.Empty;
+                        try
+                        {
+                            privateKey = await System.IO.File.ReadAllTextAsync(Path.Combine(currentDirectory, key));
+                        }
+                        catch (System.IO.DirectoryNotFoundException ex)
+                        {
+                            isError = 1;
+
+                            messages.Add($"Exception: System.IO.DirectoryNotFoundException for path {Path.Combine(currentDirectory, key)}");
+                        }
+                        catch (System.IO.FileNotFoundException ex)
+                        {
+                            isError = 1;
+                            messages.Add($"Exception: System.IO.FileNotFoundException for path {Path.Combine(currentDirectory, key)}");
+                        }
+                        catch (Exception ex)
+                        {
+                            isError = 1;
+                            messages.Add($"Exception: General Exception for path {Path.Combine(currentDirectory, key)}, {ex.Message}");
+                        }
+
+                        if (isError != 1 && verbose && !silent)
+                        {
+                            Console.ForegroundColor = ConsoleColor.DarkYellow;
+                            Console.WriteLine($"Private Key Text from {Path.Combine(currentDirectory, key)}: {privateKey}");
+                            Console.ResetColor();
+                        }
+
+                        byte[] privateKeyBytes = System.Convert.FromBase64String(privateKey);
+
+                        if (!string.IsNullOrEmpty(textinput))
+                        {
+                            if (isError != 1 && verbose && !silent)
+                            {
+                                Console.ForegroundColor = ConsoleColor.DarkYellow;
+                                Console.WriteLine($"Text Input from -t (--textinput): {textinput}");
+                                Console.ResetColor();
+                            }
+
+                            await Decrypt(currentDirectory, textinput, output, cryptographyKeyManager, privateKeyBytes, verbose, silent, isError, messages);
+                        }
+                        else if (!string.IsNullOrEmpty(fileinput))
+                        {
+                            string fileinputtext = string.Empty;
+                            try
+                            {
+                                fileinputtext = await System.IO.File.ReadAllTextAsync(Path.Combine(currentDirectory, fileinput));
+                            }
+                            catch (System.IO.DirectoryNotFoundException ex)
+                            {
+                                isError = 1;
+
+                                messages.Add($"Exception: System.IO.DirectoryNotFoundException for path {Path.Combine(currentDirectory, fileinput)}");
+                            }
+                            catch (System.IO.FileNotFoundException ex)
+                            {
+                                isError = 1;
+                                messages.Add($"Exception: System.IO.FileNotFoundException for path {Path.Combine(currentDirectory, fileinput)}");
+                            }
+                            catch (Exception ex)
+                            {
+                                isError = 1;
+                                messages.Add($"Exception: General Exception for path {Path.Combine(currentDirectory, fileinput)}, {ex.Message}");
+                            }
+
+                            if (isError != 1 && verbose && !silent)
+                            {
+                                Console.ForegroundColor = ConsoleColor.DarkYellow;
+                                Console.WriteLine($"File Input Text from -f (--fileinput): {fileinputtext}");
+                                Console.ResetColor();
+                            }
+
+                            if (isError != 1)
+                            {
+                                await Decrypt(currentDirectory, fileinputtext, output, cryptographyKeyManager, privateKeyBytes, verbose, silent, isError, messages);
+                            }
+                        }
+                        else
+                        {
+                            isError = 1;
+
+                            messages.Add($"Error: one of -t (--textinput) or -f (--fileinput) must be specified.");
+                        }
+
+
+                    }
+                    else
+                    {
+                        isError = 1;
+
+                        messages.Add($"Error: -k (--key) must be specified.");
+                    }
+
+
 
                 }
                 else if (getpublickey)
@@ -418,19 +625,120 @@ namespace Yatter.Net.Tools.CLI.Yatter
                 }
             }
 
-            Console.ForegroundColor = ConsoleColor.Red;
-            foreach (var message in messages)
+            if (!silent)
             {
-                Console.WriteLine(message);
+                Console.ForegroundColor = ConsoleColor.Red;
+                foreach (var message in messages)
+                {
+                    Console.WriteLine(message);
+                }
+                Console.ResetColor();
             }
-            Console.ResetColor();
 
             return isError;
         }
 
-        private static void ConsoleWriteVerboseBooleanCommandLineAssignment(string[] args, int isError, bool createkeypair, bool verbose, int x)
+        private static async Task Encrypt(string currentDirectory, string textinput, string output, CryptographyKeyManager cryptographyKeyManager, byte[] publicKeyBytes, bool verbose, bool silent, int isError, List<string> messages)
         {
-            if (isError!=1 && verbose)
+            cryptographyKeyManager.ImportRSAPublicKey(publicKeyBytes);
+
+            var encryptedText = cryptographyKeyManager.RSAEncryptIntoBase64(textinput);
+
+            if (string.IsNullOrEmpty(output))
+            {
+                if (silent)
+                {
+                    Console.WriteLine($"{encryptedText}");
+                }
+                else
+                {
+                    Console.WriteLine($"encryptedText: {encryptedText}");
+                }
+            }
+            else
+            {
+                try
+                { 
+                    await System.IO.File.WriteAllTextAsync(Path.Combine(currentDirectory, output), encryptedText);
+                }
+                catch (System.IO.DirectoryNotFoundException ex)
+                {
+                    isError = 1;
+
+                    messages.Add($"Exception: System.IO.DirectoryNotFoundException for path {Path.Combine(currentDirectory, output)}");
+                }
+                catch (System.IO.FileNotFoundException ex)
+                {
+                    isError = 1;
+                    messages.Add($"Exception: System.IO.FileNotFoundException for path {Path.Combine(currentDirectory, output)}");
+                }
+                catch (Exception ex)
+                {
+                    isError = 1;
+                    messages.Add($"Exception: General Exception for path {Path.Combine(currentDirectory, output)}, {ex.Message}");
+                }
+
+                if (verbose&&!silent)
+                {
+                    Console.ForegroundColor = ConsoleColor.DarkYellow;
+                    Console.WriteLine($"Encrypted Text written to {Path.Combine(currentDirectory, output)}: {encryptedText}");
+                    Console.ResetColor();
+                }
+            }
+        }
+
+        private static async Task Decrypt(string currentDirectory, string textinput, string output, CryptographyKeyManager cryptographyKeyManager, byte[] privateKeyBytes, bool verbose, bool silent, int isError, List<string> messages)
+        {
+            cryptographyKeyManager.ImportRSAPrivateKey(privateKeyBytes);
+
+            var decryptedText = cryptographyKeyManager.RSADecryptFromBase64String(textinput);
+
+            if (string.IsNullOrEmpty(output))
+            {
+                if (silent)
+                {
+                    Console.WriteLine($"{decryptedText}");
+                }
+                else
+                {
+                    Console.WriteLine($"Decrypted Text: {decryptedText}");
+                }
+            }
+            else
+            {
+                try
+                {
+                    await System.IO.File.WriteAllTextAsync(Path.Combine(currentDirectory, output), decryptedText);
+                }
+                catch (System.IO.DirectoryNotFoundException ex)
+                {
+                    isError = 1;
+
+                    messages.Add($"Exception: System.IO.DirectoryNotFoundException for path {Path.Combine(currentDirectory, output)}");
+                }
+                catch (System.IO.FileNotFoundException ex)
+                {
+                    isError = 1;
+                    messages.Add($"Exception: System.IO.FileNotFoundException for path {Path.Combine(currentDirectory, output)}");
+                }
+                catch (Exception ex)
+                {
+                    isError = 1;
+                    messages.Add($"Exception: General Exception for path {Path.Combine(currentDirectory, output)}, {ex.Message}");
+                }
+
+                if (verbose&&!silent)
+                {
+                    Console.ForegroundColor = ConsoleColor.DarkYellow;
+                    Console.WriteLine($"Decrypted Text written to {Path.Combine(currentDirectory, output)}: {decryptedText}");
+                    Console.ResetColor();
+                }
+            }
+        }
+
+        private static void ConsoleWriteVerboseBooleanCommandLineAssignment(string[] args, int isError, bool createkeypair, bool verbose, bool silent, int x)
+        {
+            if (isError!=1 && verbose && !silent)
             {
                 Console.ForegroundColor = ConsoleColor.DarkYellow;
                 Console.WriteLine($"Command Line Assignment: {args[x]} is {createkeypair}");
@@ -438,9 +746,9 @@ namespace Yatter.Net.Tools.CLI.Yatter
             }
         }
 
-        private static void ConsoleWriteVerboseStringCommandLineAssignment(string[] args, int isError, string value, bool verbose, int x)
+        private static void ConsoleWriteVerboseStringCommandLineAssignment(string[] args, int isError, string value, bool verbose, bool silent, int x)
         {
-            if (isError!=1 && verbose)
+            if (isError!=1 && verbose && !silent)
             {
                 Console.ForegroundColor = ConsoleColor.DarkYellow;
                 Console.WriteLine($"Command Line Assignment: {args[x]} is [{value}]");
@@ -471,7 +779,7 @@ namespace Yatter.Net.Tools.CLI.Yatter
             return isError;
         }
 
-        private static void AssignValueIfFollowsOrExit(string[] args, ref int isError, List<string> messages, ref string publickeyfilename, int x)
+        private static void AssignValueIfFollowsOrExit(string[] args, ref int isError, List<string> messages, ref string key, int x)
         {
             if (x + 1 < args.Length)
             {
@@ -508,7 +816,7 @@ namespace Yatter.Net.Tools.CLI.Yatter
 
                     )
                 {
-                    publickeyfilename = args[x + 1];
+                    key = args[x + 1];
                 }
                 else
                 {
