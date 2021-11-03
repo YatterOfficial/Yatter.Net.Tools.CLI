@@ -58,14 +58,9 @@ namespace Yatter.Net.Tools.CLI.Yatter
             fileinput.Description = "The cryptography command's switch to indicate text in the contents of a file that will be encrypted in conjunction with the use of the switch -e (--encrypt); optional. Path specified by -f (--fileinput) can be to a file in the current directory, relative to the current directory, or absolute.";
             command.AddOption(fileinput);
 
-            var key = new Option<string>("-k");
-            key.AddAlias("--key");
-            key.Description = "The cryptography command's switch to indicate the Base64 public or private key that will be used in conjunction with the use of the switch -e (--encrypt), or the switch -d (--decrypt), to encrypt, or decrypt, respectively; optional.";
-            command.AddOption(key);
-
             var getpublickey = new Option<bool>("-g");
             getpublickey.AddAlias("--getpublickey");
-            getpublickey.Description = "The cryptography command's switch to indicate that it will use an HttpClient to get the public key in Base64 from a DNS TXT Record indicated by the switch -n (--dnstxtkey), at a URL indicated by the switch -u (--url), or to get it from a public key server at a URL indicated by the switch -u (--url), and requiring a key id indicated by the switch -i (--id),  where a querystring appended to that url is in the format ?id=[id] and [id] is Base64Encoded; optional. When using -u (--url) in conjunction with -i (--id), do not append the querystring, the command appends this internally.";
+            getpublickey.Description = "NOT IMPLEMENTED. The cryptography command's switch to indicate that it will use an HttpClient to get the public key in Base64 from a DNS TXT Record indicated by the switch -n (--dnstxtkey), at a URL indicated by the switch -u (--url), or to get it from a public key server at a URL indicated by the switch -u (--url), and requiring a key id indicated by the switch -i (--id),  where a querystring appended to that url is in the format ?id=[id] and [id] is Base64Encoded; optional. When using -u (--url) in conjunction with -i (--id), do not append the querystring, the command appends this internally.";
             command.AddOption(getpublickey);
 
             var url = new Option<bool>("-u");
@@ -152,7 +147,7 @@ namespace Yatter.Net.Tools.CLI.Yatter
             bool decrypt = false;
             string textinput = string.Empty;
             string fileinput = string.Empty;
-            string key = string.Empty;
+            bool modeprivate = false;
             bool getpublickey = false;
             string url = string.Empty;
             string anykeyfilename = string.Empty;
@@ -215,11 +210,11 @@ namespace Yatter.Net.Tools.CLI.Yatter
                     ConsoleWriteVerboseStringCommandLineAssignment(args, isError, fileinput, verbose, silent, x);
                 }
 
-                if (args[x].Equals("-k") || args[x].Equals("--key"))
+                if (args[x].Equals("-m") || args[x].Equals("--modeprivate"))
                 {
-                    AssignValueIfFollowsOrExit(args, ref isError, messages, ref key, x);
+                    modeprivate = true;
 
-                    ConsoleWriteVerboseStringCommandLineAssignment(args, isError, key, verbose, silent, x);
+                    ConsoleWriteVerboseBooleanCommandLineAssignment(args, isError, modeprivate, verbose, silent, x);
                 }
 
                 if (args[x].Equals("-g") || args[x].Equals("--getpublickey"))
@@ -278,6 +273,13 @@ namespace Yatter.Net.Tools.CLI.Yatter
                     ConsoleWriteVerboseStringCommandLineAssignment(args, isError, output, verbose, silent, x);
                 }
 
+                if (args[x].Equals("-v") || args[x].Equals("--verbose"))
+                {
+                    verbose = true;
+
+                    ConsoleWriteVerboseBooleanCommandLineAssignment(args, isError, verbose, verbose, silent, x);
+                }
+
                 if (args[x].Equals("-s") || args[x].Equals("--silent"))
                 {
                     silent = true;
@@ -303,23 +305,61 @@ namespace Yatter.Net.Tools.CLI.Yatter
 
             if(encrypt)
             {
-                isError = EnforceEncryptDecryptStringStates(isError, messages, textinput, fileinput, key, anykeyfilename);
+                isError = EnforceEncryptDecryptStringStates(isError, messages, textinput, fileinput, anykeyfilename);
 
                 if (createkeypair || decrypt || getpublickey)
                 {
                     isError = 1;
                     messages.Add("Exiting: none of -c (--createkeypair), -d (--decrypt), or -g (--getpublickey), may be specified with -e (--encrypt).");
                 }
+
+                if(string.IsNullOrEmpty(publickeyfilename)&&string.IsNullOrEmpty(privatekeyfilename))
+                {
+                    isError = 1;
+                    messages.Add("Exiting: one of -p (--publickeyfilename) or -P (--privatekeyfilename) must be specified.");
+                }
+
+                if (!string.IsNullOrEmpty(publickeyfilename) && !string.IsNullOrEmpty(privatekeyfilename))
+                {
+                    isError = 1;
+                    messages.Add("Exiting: only one of -p (--publickeyfilename) and -P (--privatekeyfilename) can be specified.");
+                }
+
+                if (!string.IsNullOrEmpty(publickeyfilename) && string.IsNullOrEmpty(privatekeyfilename))
+                {
+                    modeprivate = false;
+                }
+
+                if (string.IsNullOrEmpty(publickeyfilename) && !string.IsNullOrEmpty(privatekeyfilename))
+                {
+                    modeprivate = true;
+                }
             }
 
             if (decrypt)
             {
-                isError = EnforceEncryptDecryptStringStates(isError, messages, textinput, fileinput, key, anykeyfilename);
+                isError = EnforceEncryptDecryptStringStates(isError, messages, textinput, fileinput, anykeyfilename);
 
                 if (createkeypair || encrypt || getpublickey)
                 {
                     isError = 1;
                     messages.Add("Exiting: none of -c (--createkeypair), -e (--encrypt), or -g (--getpublickey), may be specified with -d (--decrypt).");
+                }
+
+                if (string.IsNullOrEmpty(publickeyfilename) && string.IsNullOrEmpty(privatekeyfilename))
+                {
+                    isError = 1;
+                    messages.Add("Exiting: one of -p (--publickeyfilename) or -P (--privatekeyfilename) must be specified.");
+                }
+
+                if (!string.IsNullOrEmpty(publickeyfilename) && string.IsNullOrEmpty(privatekeyfilename))
+                {
+                    modeprivate = false;
+                }
+
+                if (string.IsNullOrEmpty(publickeyfilename) && !string.IsNullOrEmpty(privatekeyfilename))
+                {
+                    modeprivate = true;
                 }
             }
 
@@ -410,39 +450,56 @@ namespace Yatter.Net.Tools.CLI.Yatter
                 else if (encrypt)
                 {
                     var cryptographyKeyManager = new CryptographyKeyManager();
+                    string encryptionKey = string.Empty;
+                    string keyused = string.Empty;
 
-                    if(!string.IsNullOrEmpty(key))
+                    if(modeprivate)
                     {
-                        string publicKey = string.Empty;
+                        keyused = privatekeyfilename;
+                    }
+                    else
+                    {
+                        keyused = publickeyfilename;
+                    }
+
+                    if (!string.IsNullOrEmpty(keyused))
+                    {
                         try
                         {
-                            publicKey = await System.IO.File.ReadAllTextAsync(Path.Combine(currentDirectory, key));
+                            if (modeprivate)
+                            {
+                                encryptionKey = await System.IO.File.ReadAllTextAsync(Path.Combine(currentDirectory, privatekeyfilename));
+                            }
+                            else
+                            {
+                                encryptionKey = await System.IO.File.ReadAllTextAsync(Path.Combine(currentDirectory, publickeyfilename));
+                            }
                         }
                         catch(System.IO.DirectoryNotFoundException ex)
                         {
                             isError = 1;
 
-                            messages.Add($"Exception: System.IO.DirectoryNotFoundException for path {Path.Combine(currentDirectory, key)}");
+                            messages.Add($"Exception: System.IO.DirectoryNotFoundException for path {Path.Combine(currentDirectory, keyused)}");
                         }
                         catch(System.IO.FileNotFoundException ex)
                         {
                             isError = 1;
-                            messages.Add($"Exception: System.IO.FileNotFoundException for path {Path.Combine(currentDirectory, key)}");
+                            messages.Add($"Exception: System.IO.FileNotFoundException for path {Path.Combine(currentDirectory, keyused)}");
                         }
                         catch(Exception ex)
                         {
                             isError = 1;
-                            messages.Add($"Exception: General Exception for path {Path.Combine(currentDirectory, key)}, {ex.Message}");
+                            messages.Add($"Exception: General Exception for path {Path.Combine(currentDirectory, keyused)}, {ex.Message}");
                         }
 
                         if (isError != 1 && verbose && !silent)
                         {
                             Console.ForegroundColor = ConsoleColor.DarkYellow;
-                            Console.WriteLine($"Public Key Text from {Path.Combine(currentDirectory, key)}: {publicKey}");
+                            Console.WriteLine($"Key Text from {Path.Combine(currentDirectory, keyused)}: {encryptionKey}");
                             Console.ResetColor();
                         }
 
-                        byte[] publicKeyBytes = System.Convert.FromBase64String(publicKey);
+                        byte[] keyBytes = System.Convert.FromBase64String(encryptionKey);
 
                         if (!string.IsNullOrEmpty(textinput))
                         {
@@ -453,7 +510,7 @@ namespace Yatter.Net.Tools.CLI.Yatter
                                 Console.ResetColor();
                             }
 
-                            await Encrypt(currentDirectory, textinput, output, cryptographyKeyManager, publicKeyBytes, verbose, silent, isError, messages);
+                            await Encrypt(currentDirectory, textinput, output, cryptographyKeyManager, keyBytes, verbose, silent, isError, messages, modeprivate);
                         }
                         else if (!string.IsNullOrEmpty(fileinput))
                         {
@@ -488,14 +545,14 @@ namespace Yatter.Net.Tools.CLI.Yatter
 
                             if (isError != 1)
                             {
-                                await Encrypt(currentDirectory, fileinputtext, output, cryptographyKeyManager, publicKeyBytes, verbose, silent, isError, messages);
+                                await Encrypt(currentDirectory, fileinputtext, output, cryptographyKeyManager, keyBytes, verbose, silent, isError, messages, modeprivate);
                             }
                         }
                         else
                         {
                             isError = 1;
 
-                            messages.Add($"Error: one of -t (--textinput) or -f (--fileinput) must be specified.");
+                            messages.Add($"Error: one of -p (--publickeyfilename) or -P (--privatekeyfilename) must be specified.");
                         }
 
 
@@ -504,7 +561,7 @@ namespace Yatter.Net.Tools.CLI.Yatter
                     {
                         isError = 1;
 
-                        messages.Add($"Error: -k (--key) must be specified.");
+                        messages.Add($"Error: one of -p (--publickeyfilename) or -P (--privatekeyfilename) must be specified.");
                     }
 
 
@@ -512,106 +569,157 @@ namespace Yatter.Net.Tools.CLI.Yatter
                 }
                 else if (decrypt)
                 {
-
                     var cryptographyKeyManager = new CryptographyKeyManager();
 
-                    if (!string.IsNullOrEmpty(key))
+                    string publicencryptionKey = string.Empty;
+                    string privateencryptionKey = string.Empty;
+
+                    if (!string.IsNullOrEmpty(privatekeyfilename))
                     {
-                        string privateKey = string.Empty;
                         try
-                        {
-                            privateKey = await System.IO.File.ReadAllTextAsync(Path.Combine(currentDirectory, key));
+                        { 
+                            privateencryptionKey = await System.IO.File.ReadAllTextAsync(Path.Combine(currentDirectory, privatekeyfilename));
                         }
                         catch (System.IO.DirectoryNotFoundException ex)
                         {
                             isError = 1;
 
-                            messages.Add($"Exception: System.IO.DirectoryNotFoundException for path {Path.Combine(currentDirectory, key)}");
+                            messages.Add($"Exception: System.IO.DirectoryNotFoundException for path {Path.Combine(currentDirectory, privatekeyfilename)}");
                         }
                         catch (System.IO.FileNotFoundException ex)
                         {
                             isError = 1;
-                            messages.Add($"Exception: System.IO.FileNotFoundException for path {Path.Combine(currentDirectory, key)}");
+                            messages.Add($"Exception: System.IO.FileNotFoundException for path {Path.Combine(currentDirectory, privatekeyfilename)}");
                         }
                         catch (Exception ex)
                         {
                             isError = 1;
-                            messages.Add($"Exception: General Exception for path {Path.Combine(currentDirectory, key)}, {ex.Message}");
+                            messages.Add($"Exception: General Exception for path {Path.Combine(currentDirectory, privatekeyfilename)}, {ex.Message}");
+                        }
+                    }
+                    else
+                    {
+                        isError = 1;
+                        messages.Add("Error: when specifying -d (--decrypt), -P (--privatekeyfilename) must also be specified.");
+                    }
+
+                    if (!string.IsNullOrEmpty(publickeyfilename))
+                    {
+                        try
+                        { 
+                            publicencryptionKey = await System.IO.File.ReadAllTextAsync(Path.Combine(currentDirectory, publickeyfilename));
+                        }
+                        catch (System.IO.DirectoryNotFoundException ex)
+                        {
+                            isError = 1;
+
+                            messages.Add($"Exception: System.IO.DirectoryNotFoundException for path {Path.Combine(currentDirectory, publickeyfilename)}");
+                        }
+                        catch (System.IO.FileNotFoundException ex)
+                        {
+                            isError = 1;
+                            messages.Add($"Exception: System.IO.FileNotFoundException for path {Path.Combine(currentDirectory, publickeyfilename)}");
+                        }
+                        catch (Exception ex)
+                        {
+                            isError = 1;
+                            messages.Add($"Exception: General Exception for path {Path.Combine(currentDirectory, publickeyfilename)}, {ex.Message}");
+                        }
+                    }
+
+                    if (isError != 1 && verbose && !silent)
+                    {
+                        if (!string.IsNullOrEmpty(publicencryptionKey))
+                        {
+                            Console.ForegroundColor = ConsoleColor.DarkYellow;
+                            Console.WriteLine($"Public Key Text from {Path.Combine(currentDirectory, publickeyfilename)}: {publicencryptionKey}");
+                            Console.ResetColor();
+                        }
+                    }
+
+                    if (isError != 1 && verbose && !silent)
+                    {
+                        if (!string.IsNullOrEmpty(privateencryptionKey))
+                        {
+                            Console.ForegroundColor = ConsoleColor.DarkYellow;
+                            Console.WriteLine($"Key Text from {Path.Combine(currentDirectory, privatekeyfilename)}: {privateencryptionKey}");
+                            Console.ResetColor();
+                        }
+                    }
+
+                    byte[]? privateKeyBytes = null;
+
+                    if (!string.IsNullOrEmpty(privateencryptionKey))
+                    {
+                        privateKeyBytes = System.Convert.FromBase64String(privateencryptionKey);
+                    }
+
+                    byte[]? publicKeyBytes = null;
+
+                    if (!string.IsNullOrEmpty(publicencryptionKey))
+                    {
+                        publicKeyBytes = System.Convert.FromBase64String(publicencryptionKey);
+                    }
+
+                    if (!string.IsNullOrEmpty(textinput))
+                    {
+                        if (isError != 1 && verbose && !silent)
+                        {
+                            Console.ForegroundColor = ConsoleColor.DarkYellow;
+                            Console.WriteLine($"Text Input from -t (--textinput): {textinput}");
+                            Console.ResetColor();
+                        }
+
+                        if (isError != 1)
+                        {
+#pragma warning disable CS8604 // Possible null reference argument. publicKeyBytes
+                            await Decrypt(currentDirectory, textinput, output, cryptographyKeyManager, privateKeyBytes, publicKeyBytes, verbose, silent, isError, messages);
+#pragma warning restore CS8604 // Possible null reference argument.
+                        }
+                    }
+                    else if (!string.IsNullOrEmpty(fileinput))
+                    {
+                        string fileinputtext = string.Empty;
+                        try
+                        {
+                            fileinputtext = await System.IO.File.ReadAllTextAsync(Path.Combine(currentDirectory, fileinput));
+                        }
+                        catch (System.IO.DirectoryNotFoundException ex)
+                        {
+                            isError = 1;
+                            messages.Add($"Exception: System.IO.DirectoryNotFoundException for path {Path.Combine(currentDirectory, fileinput)}");
+                        }
+                        catch (System.IO.FileNotFoundException ex)
+                        {
+                            isError = 1;
+                            messages.Add($"Exception: System.IO.FileNotFoundException for path {Path.Combine(currentDirectory, fileinput)}");
+                        }
+                        catch (Exception ex)
+                        {
+                            isError = 1;
+                            messages.Add($"Exception: General Exception for path {Path.Combine(currentDirectory, fileinput)}, {ex.Message}");
                         }
 
                         if (isError != 1 && verbose && !silent)
                         {
                             Console.ForegroundColor = ConsoleColor.DarkYellow;
-                            Console.WriteLine($"Private Key Text from {Path.Combine(currentDirectory, key)}: {privateKey}");
+                            Console.WriteLine($"File Input Text from -f (--fileinput): {fileinputtext}");
                             Console.ResetColor();
                         }
 
-                        byte[] privateKeyBytes = System.Convert.FromBase64String(privateKey);
-
-                        if (!string.IsNullOrEmpty(textinput))
+                        if (isError != 1)
                         {
-                            if (isError != 1 && verbose && !silent)
-                            {
-                                Console.ForegroundColor = ConsoleColor.DarkYellow;
-                                Console.WriteLine($"Text Input from -t (--textinput): {textinput}");
-                                Console.ResetColor();
-                            }
-
-                            await Decrypt(currentDirectory, textinput, output, cryptographyKeyManager, privateKeyBytes, verbose, silent, isError, messages);
+#pragma warning disable CS8604 // Possible null reference argument. publicKeyBytes
+                            await Decrypt(currentDirectory, fileinputtext, output, cryptographyKeyManager, privateKeyBytes, publicKeyBytes, verbose, silent, isError, messages);
+#pragma warning restore CS8604 // Possible null reference argument.
                         }
-                        else if (!string.IsNullOrEmpty(fileinput))
-                        {
-                            string fileinputtext = string.Empty;
-                            try
-                            {
-                                fileinputtext = await System.IO.File.ReadAllTextAsync(Path.Combine(currentDirectory, fileinput));
-                            }
-                            catch (System.IO.DirectoryNotFoundException ex)
-                            {
-                                isError = 1;
-
-                                messages.Add($"Exception: System.IO.DirectoryNotFoundException for path {Path.Combine(currentDirectory, fileinput)}");
-                            }
-                            catch (System.IO.FileNotFoundException ex)
-                            {
-                                isError = 1;
-                                messages.Add($"Exception: System.IO.FileNotFoundException for path {Path.Combine(currentDirectory, fileinput)}");
-                            }
-                            catch (Exception ex)
-                            {
-                                isError = 1;
-                                messages.Add($"Exception: General Exception for path {Path.Combine(currentDirectory, fileinput)}, {ex.Message}");
-                            }
-
-                            if (isError != 1 && verbose && !silent)
-                            {
-                                Console.ForegroundColor = ConsoleColor.DarkYellow;
-                                Console.WriteLine($"File Input Text from -f (--fileinput): {fileinputtext}");
-                                Console.ResetColor();
-                            }
-
-                            if (isError != 1)
-                            {
-                                await Decrypt(currentDirectory, fileinputtext, output, cryptographyKeyManager, privateKeyBytes, verbose, silent, isError, messages);
-                            }
-                        }
-                        else
-                        {
-                            isError = 1;
-
-                            messages.Add($"Error: one of -t (--textinput) or -f (--fileinput) must be specified.");
-                        }
-
-
                     }
                     else
                     {
                         isError = 1;
 
-                        messages.Add($"Error: -k (--key) must be specified.");
+                        messages.Add($"Error: one of -t (--textinput) or -f (--fileinput) must be specified.");
                     }
-
-
 
                 }
                 else if (getpublickey)
@@ -638,9 +746,16 @@ namespace Yatter.Net.Tools.CLI.Yatter
             return isError;
         }
 
-        private static async Task Encrypt(string currentDirectory, string textinput, string output, CryptographyKeyManager cryptographyKeyManager, byte[] publicKeyBytes, bool verbose, bool silent, int isError, List<string> messages)
+        private static async Task Encrypt(string currentDirectory, string textinput, string output, CryptographyKeyManager cryptographyKeyManager, byte[] keyBytes, bool verbose, bool silent, int isError, List<string> messages, bool modeprivate)
         {
-            cryptographyKeyManager.ImportRSAPublicKey(publicKeyBytes);
+            if (modeprivate)
+            {
+                cryptographyKeyManager.ImportRSAPrivateKey(keyBytes);
+            }
+            else
+            {
+                cryptographyKeyManager.ImportRSAPublicKey(keyBytes);
+            }
 
             var encryptedText = cryptographyKeyManager.RSAEncryptIntoBase64(textinput);
 
@@ -687,14 +802,51 @@ namespace Yatter.Net.Tools.CLI.Yatter
             }
         }
 
-        private static async Task Decrypt(string currentDirectory, string textinput, string output, CryptographyKeyManager cryptographyKeyManager, byte[] privateKeyBytes, bool verbose, bool silent, int isError, List<string> messages)
+        private static async Task Decrypt(string currentDirectory, string textinput, string output, CryptographyKeyManager cryptographyKeyManager, byte[] privateKeyBytes, byte[] publicKeyBytes, bool verbose, bool silent, int isError, List<string> messages)
         {
-            cryptographyKeyManager.ImportRSAPrivateKey(privateKeyBytes);
+            if (publicKeyBytes != null)
+            {
+                cryptographyKeyManager.ImportRSAPublicKey(publicKeyBytes);
+
+                if (verbose && !silent)
+                {
+                    Console.ForegroundColor = ConsoleColor.DarkYellow;
+                    Console.WriteLine($"Public Key imported to CryptographyKeyManager.");
+                    Console.ResetColor();
+                }
+
+            }
+
+            if (privateKeyBytes!=null)
+            {
+                cryptographyKeyManager.ImportRSAPrivateKey(privateKeyBytes);
+
+                if (verbose && !silent)
+                {
+                    Console.ForegroundColor = ConsoleColor.DarkYellow;
+                    Console.WriteLine($"Private Key imported to CryptographyKeyManager.");
+                    Console.ResetColor();
+                }
+            }
 
             var decryptedText = cryptographyKeyManager.RSADecryptFromBase64String(textinput);
 
+            if (verbose && !silent)
+            {
+                Console.ForegroundColor = ConsoleColor.DarkYellow;
+                Console.WriteLine($"Decrypted Text: {decryptedText}.");
+                Console.ResetColor();
+            }
+
             if (string.IsNullOrEmpty(output))
             {
+                if (verbose && !silent)
+                {
+                    Console.ForegroundColor = ConsoleColor.DarkYellow;
+                    Console.WriteLine($"Writing output to Console.");
+                    Console.ResetColor();
+                }
+
                 if (silent)
                 {
                     Console.WriteLine($"{decryptedText}");
@@ -706,6 +858,13 @@ namespace Yatter.Net.Tools.CLI.Yatter
             }
             else
             {
+                if (verbose && !silent)
+                {
+                    Console.ForegroundColor = ConsoleColor.DarkYellow;
+                    Console.WriteLine($"Writing Decrypted Text [{decryptedText}] to {Path.Combine(currentDirectory, output)}.");
+                    Console.ResetColor();
+                }
+
                 try
                 {
                     await System.IO.File.WriteAllTextAsync(Path.Combine(currentDirectory, output), decryptedText);
@@ -756,24 +915,12 @@ namespace Yatter.Net.Tools.CLI.Yatter
             }
         }
 
-        private static int EnforceEncryptDecryptStringStates(int isError, List<string> messages, string textinput, string fileinput, string key, string anykeyfilename)
+        private static int EnforceEncryptDecryptStringStates(int isError, List<string> messages, string textinput, string fileinput, string anykeyfilename)
         {
             if (!string.IsNullOrEmpty(textinput) && !string.IsNullOrEmpty(fileinput))
             {
                 isError = 1;
                 messages.Add("Exiting: only one of -t (--textinput) and -f (--fileinput) may be specified.");
-            }
-
-            if (!string.IsNullOrEmpty(key) && !string.IsNullOrEmpty(anykeyfilename))
-            {
-                isError = 1;
-                messages.Add("Exiting: only one of -k (--key) and -a (--anykeyfilename) may be specified.");
-            }
-
-            if (string.IsNullOrEmpty(key) && string.IsNullOrEmpty(anykeyfilename))
-            {
-                isError = 1;
-                messages.Add("Exiting: one of -k (--key) and -a (--anykeyfilename) must be specified.");
             }
 
             return isError;
