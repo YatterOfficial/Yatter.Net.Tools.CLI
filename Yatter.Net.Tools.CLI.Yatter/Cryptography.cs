@@ -14,7 +14,7 @@ namespace Yatter.Net.Tools.CLI.Yatter
 {
     public static class Cryptography
     {
-        public static async Task<int> Run(string[] args, string currentDirectory)
+        public static async Task<int> Run(string[] args, string currentDirectory, bool silent)
         {
 
             RootCommand rootCommand = new RootCommand(
@@ -104,15 +104,15 @@ namespace Yatter.Net.Tools.CLI.Yatter
             verbose.Description = "Instructs the CLI to make verbose CLI comments as it executes.";
             command.AddOption(verbose);
 
-            var silent = new Option<bool>("--silent");
-            silent.AddAlias("-s");
-            silent.Description = "Instructs the CLI to suppress all unnecessary comments";
-            command.AddOption(silent);
+            var silentOption = new Option<bool>("--silent");
+            silentOption.AddAlias("-s");
+            silentOption.Description = "Instructs the CLI to suppress all unnecessary comments";
+            command.AddOption(silentOption);
 
 
             command.Handler = CommandHandler.Create<ParseResult>(async (result) =>
             {
-                await RunActions(args, currentDirectory);
+                await RunActions(args, currentDirectory, silent);
             });
 
             var commandLineBuilder = new CommandLineBuilder(rootCommand);
@@ -135,7 +135,7 @@ namespace Yatter.Net.Tools.CLI.Yatter
             return await parser.InvokeAsync(args);
         }
 
-        private static async Task<int> RunActions(string[] args, string currentDirectory)
+        private static async Task<int> RunActions(string[] args, string currentDirectory, bool silent)
         {
             int isError = 0;
             var messages = new List<string>();
@@ -157,7 +157,6 @@ namespace Yatter.Net.Tools.CLI.Yatter
             string tokenheadervalue = string.Empty;
             string output = string.Empty;
             bool verbose = false;
-            bool silent = false;
 
             for (int x = 0; x < args.Length; x++)
             {

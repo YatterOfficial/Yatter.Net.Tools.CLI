@@ -13,7 +13,7 @@
     <Owners>Anthony Harrison</Owners>
     <PackageProjectUrl>https://github.com/YatterOfficial/Yatter.Net.Tools.CLI</PackageProjectUrl>
     <PackageIcon>icon.png</PackageIcon>
-    <PackageReleaseNotes>Alpha Release. Added unpacking for .yatra lightweight archives.</PackageReleaseNotes>
+    <PackageReleaseNotes>Alpha Release. Added cryptography command.</PackageReleaseNotes>
     <Summary>Yatter CLI for the automation of Yatter Content-Creation</Summary>
     <PackageTags>dotnet-new;tool;yatter</PackageTags>
     <Title>Yatter Dotnet CLI</Title>

@@ -58,7 +58,7 @@ namespace Yatter.Net.Tools.CLI
             {
                 currentExecutionModule = "cryptography";
 
-                response = await Cryptography.Run(args, System.Environment.CurrentDirectory);
+                response = await Cryptography.Run(args, System.Environment.CurrentDirectory, silent);
             }
             else
             {
