@@ -37,7 +37,7 @@ Presently, the cli's capability is:
 
 - yatter microsite [options]
 - yatter cryptography [option]
-  - y@R App Content Creators, please note that the following CLI commands can be used to obtain the current public key for uploading user content to the app (you can remove or utilize -s (silent) or -v (verbose), according tou your need):
+  - y@R App Alpha Content Creators, please note that the following CLI commands can be used to obtain the current public key for uploading user content to the app (you can remove or utilize -s (silent) or -v (verbose), according tou your need):
     - ```yatter cryptography -g -u publickeys.yatr.me -n userupload -s```
     - ```yatter cryptography -g -u publickeys.yatr.me -n userupload -v```
     - ```yatter cryptography -g -u publickeys.yatr.me -n userupload -o "PublicKey.txt" -s```
