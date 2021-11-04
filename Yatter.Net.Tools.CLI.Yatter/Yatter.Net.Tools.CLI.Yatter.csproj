@@ -9,10 +9,12 @@
     <None Remove="Yatter.UI.ListBuilder.Serialization" />
     <None Remove="System.CommandLine" />
     <None Remove="Yatter.Security.Cryptography" />
+    <None Remove="DnsClient" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Yatter.UI.ListBuilder.Serialization" Version="0.0.8" />
     <PackageReference Include="System.CommandLine" Version="2.0.0-beta1.21308.1" />
     <PackageReference Include="Yatter.Security.Cryptography" Version="0.0.1" />
+    <PackageReference Include="DnsClient" Version="1.5.0" />
   </ItemGroup>
 </Project>

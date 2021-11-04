@@ -8,6 +8,7 @@ using System.IO;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
+using DnsClient;
 using Yatter.Security.Cryptography;
 
 namespace Yatter.Net.Tools.CLI.Yatter
@@ -60,19 +61,13 @@ namespace Yatter.Net.Tools.CLI.Yatter
 
             var getpublickey = new Option<bool>("-g");
             getpublickey.AddAlias("--getpublickey");
-            getpublickey.Description = "NOT IMPLEMENTED. The cryptography command's switch to indicate that it will use an HttpClient to get the public key in Base64 from a DNS TXT Record indicated by the switch -n (--dnstxtkey), at a URL indicated by the switch -u (--url), or to get it from a public key server at a URL indicated by the switch -u (--url), and requiring a key id indicated by the switch -i (--id),  where a querystring appended to that url is in the format ?id=[id] and [id] is Base64Encoded; optional. When using -u (--url) in conjunction with -i (--id), do not append the querystring, the command appends this internally.";
+            getpublickey.Description = "The cryptography command's switch to indicate that it will use an HttpClient to get the public key in Base64 from a DNS TXT Record indicated by the switch -n (--dnstxtkey), at a URL indicated by the switch -u (--url), or to get it from a public key server at a URL indicated by the switch -u (--url), and requiring a key id indicated by the switch -i (--id),  where a querystring appended to that url is in the format ?id=[id] and [id] is Base64Encoded; optional. When using -u (--url) in conjunction with -i (--id), do not append the querystring, the command appends this internally.";
             command.AddOption(getpublickey);
 
             var url = new Option<bool>("-u");
             url.AddAlias("--url");
             url.Description = "The cryptography command's switch to indicate the URL that will be used in conjunction with -g (getpublickey).";
             command.AddOption(url);
-
-
-            var anykeyfilename = new Option<string>("-a");
-            anykeyfilename.AddAlias("--anykeyfilename");
-            anykeyfilename.Description = "The cryptography command's switch to indicate the Base64 public or private key in the contents of the indicated filename that will be used in conjunction with the use of the switch -e (--encrypt), or the switch -d (--decrypt), to encrypt, or decrypt, respectively; optional.";
-            command.AddOption(anykeyfilename);
 
             var dnstxtkey = new Option<string>("-n");
             dnstxtkey.AddAlias("--dnstxtkey");
@@ -81,17 +76,17 @@ namespace Yatter.Net.Tools.CLI.Yatter
 
             var id = new Option<string>("-i");
             id.AddAlias("--id");
-            id.Description = "The cryptography command's switch to indicate the id that will be used in conjunction with the switch -g (--getpublickey); optional. Cannot be used with -n (--dnstxtkey).";
+            id.Description = "NOT IMPLEMENTED. The cryptography command's switch to indicate the id that will be used in conjunction with the switch -g (--getpublickey); optional. Cannot be used with -n (--dnstxtkey).";
             command.AddOption(id);
 
             var tokenheaderkey = new Option<string>("-y");
             tokenheaderkey.AddAlias("--tokenheaderkey");
-            tokenheaderkey.Description = "The cryptography command's switch to indicate the header key, if required, of a -u (--url) that will be used in conjunction with the switch -i (--id); optional.";
+            tokenheaderkey.Description = "NOT IMPLEMENTED. The cryptography command's switch to indicate the header key, if required, of a -u (--url) that will be used in conjunction with the switch -i (--id); optional.";
             command.AddOption(tokenheaderkey);
 
             var tokenheadervalue = new Option<string>("-z");
             tokenheadervalue.AddAlias("--tokenheadervalue");
-            tokenheadervalue.Description = "The cryptography command's switch to indicate the header value, if required, of a -u (--url) that will be used in conjunction with the switch -i (--id); optional.";
+            tokenheadervalue.Description = "NOT IMPLEMENTED. The cryptography command's switch to indicate the header value, if required, of a -u (--url) that will be used in conjunction with the switch -i (--id); optional.";
             command.AddOption(tokenheadervalue);
 
             var output = new Option<string>("-o");
@@ -150,7 +145,6 @@ namespace Yatter.Net.Tools.CLI.Yatter
             bool modeprivate = false;
             bool getpublickey = false;
             string url = string.Empty;
-            string anykeyfilename = string.Empty;
             string dnstxtkey = string.Empty;
             string id = string.Empty;
             string tokenheaderkey = string.Empty;
@@ -230,13 +224,6 @@ namespace Yatter.Net.Tools.CLI.Yatter
                     ConsoleWriteVerboseStringCommandLineAssignment(args, isError, url, verbose, silent, x);
                 }
 
-                if (args[x].Equals("-a") || args[x].Equals("--anykeyfilename"))
-                {
-                    AssignValueIfFollowsOrExit(args, ref isError, messages, ref anykeyfilename, x);
-
-                    ConsoleWriteVerboseStringCommandLineAssignment(args, isError, anykeyfilename, verbose, silent, x);
-                }
-
                 if (args[x].Equals("-n") || args[x].Equals("--dnstxtkey"))
                 {
                     AssignValueIfFollowsOrExit(args, ref isError, messages, ref dnstxtkey, x);
@@ -304,7 +291,7 @@ namespace Yatter.Net.Tools.CLI.Yatter
 
             if(encrypt)
             {
-                isError = EnforceEncryptDecryptStringStates(isError, messages, textinput, fileinput, anykeyfilename);
+                isError = EnforceEncryptDecryptStringStates(isError, messages, textinput, fileinput);
 
                 if (createkeypair || decrypt || getpublickey)
                 {
@@ -337,7 +324,7 @@ namespace Yatter.Net.Tools.CLI.Yatter
 
             if (decrypt)
             {
-                isError = EnforceEncryptDecryptStringStates(isError, messages, textinput, fileinput, anykeyfilename);
+                isError = EnforceEncryptDecryptStringStates(isError, messages, textinput, fileinput);
 
                 if (createkeypair || encrypt || getpublickey)
                 {
@@ -723,7 +710,57 @@ namespace Yatter.Net.Tools.CLI.Yatter
                 }
                 else if (getpublickey)
                 {
+                    if (!string.IsNullOrEmpty(url))
+                    {
+                        //await GetDNSTxtRecord("publickeys.yatr.me", "userupload", true, silent);
 
+                        if (!string.IsNullOrEmpty(dnstxtkey))
+                        {
+                            var publicKey = await GetDNSTxtRecord(url, dnstxtkey, verbose, silent);
+
+                            if(string.IsNullOrEmpty(output))
+                            {
+                                if (!silent)
+                                {
+                                    Console.WriteLine($"Public Key: {publicKey}");
+                                }
+                                else
+                                {
+                                    Console.WriteLine($"{publicKey}");
+                                }
+                            }
+                            else
+                            {
+                                try
+                                {
+                                    await System.IO.File.WriteAllTextAsync(Path.Combine(currentDirectory, output), publicKey);
+
+                                    if (verbose && !silent)
+                                    {
+                                        Console.ForegroundColor = ConsoleColor.DarkYellow;
+                                        Console.WriteLine($"Writing Public Key to: {Path.Combine(currentDirectory, output)}");
+                                        Console.WriteLine($"Public Key Written: {publicKey}");
+                                        Console.ResetColor();
+                                    }
+                                }
+                                catch (System.IO.DirectoryNotFoundException ex)
+                                {
+                                    isError = 1;
+                                    messages.Add($"Exception: System.IO.DirectoryNotFoundException for path {Path.Combine(currentDirectory, fileinput)}");
+                                }
+                                catch (System.IO.FileNotFoundException ex)
+                                {
+                                    isError = 1;
+                                    messages.Add($"Exception: System.IO.FileNotFoundException for path {Path.Combine(currentDirectory, fileinput)}");
+                                }
+                                catch (Exception ex)
+                                {
+                                    isError = 1;
+                                    messages.Add($"Exception: General Exception for path {Path.Combine(currentDirectory, fileinput)}, {ex.Message}");
+                                }
+                            }
+                        }
+                    }
                 }
                 else
                 {
@@ -914,7 +951,7 @@ namespace Yatter.Net.Tools.CLI.Yatter
             }
         }
 
-        private static int EnforceEncryptDecryptStringStates(int isError, List<string> messages, string textinput, string fileinput, string anykeyfilename)
+        private static int EnforceEncryptDecryptStringStates(int isError, List<string> messages, string textinput, string fileinput)
         {
             if (!string.IsNullOrEmpty(textinput) && !string.IsNullOrEmpty(fileinput))
             {
@@ -947,8 +984,6 @@ namespace Yatter.Net.Tools.CLI.Yatter
                     args[x + 1] != "--key" &&
                     args[x + 1] != "-g" &&
                     args[x + 1] != "--getpublickey" &&
-                    args[x + 1] != "-a" &&
-                    args[x + 1] != "--anykeyfilename" &&
                     args[x + 1] != "-n" &&
                     args[x + 1] != "--dnstxtkey" &&
                     args[x + 1] != "-i" &&
@@ -958,8 +993,11 @@ namespace Yatter.Net.Tools.CLI.Yatter
                     args[x + 1] != "-z" &&
                     args[x + 1] != "--tokenheadervalue" &&
                     args[x + 1] != "-o" &&
-                    args[x + 1] != "--output"
-
+                    args[x + 1] != "--output" &&
+                    args[x + 1] != "-v" &&
+                    args[x + 1] != "--verbose" &&
+                    args[x + 1] != "-s" &&
+                    args[x + 1] != "--silent"
                     )
                 {
                     key = args[x + 1];
@@ -970,6 +1008,81 @@ namespace Yatter.Net.Tools.CLI.Yatter
                     messages.Add($"Exiting: {args[x]} specified but it's value does not follow it.");
                 }
             }
+        }
+
+        private async static Task<string> GetDNSTxtRecord(string url, string txtHostName, bool verbose, bool silent)
+        {
+            if (verbose && !silent)
+            {
+                Console.ForegroundColor = ConsoleColor.DarkYellow;
+                Console.WriteLine($"GetPublicKey Url: {url}");
+                Console.WriteLine($"GetPublicKey TXT Host Name: {txtHostName}");
+                Console.ResetColor();
+            }
+
+            string publickey = string.Empty;
+
+            bool useInit = false;
+
+            bool matchFound = false;
+
+            try
+            {
+                var client = new LookupClient();
+
+                var records = await client
+                    .QueryAsync(url, QueryType.TXT);
+
+                if (records != null)
+                {
+                    var answers = records.Answers;
+                    foreach (var record in answers)
+                    {
+                        if (verbose && !silent)
+                        {
+                            Console.ForegroundColor = ConsoleColor.DarkYellow;
+                            Console.WriteLine($"DNSResourceRecord Answer: {record}");
+                            Console.ResetColor();
+                        }
+
+                        var split = record.ToString().Split(" ");
+
+                        if (split != null && split.Length == 5)
+                        {
+                            if (split[4].Contains(":"))
+                            {
+                                split[4] = split[4].Substring(1);
+                                split[4] = split[4].Substring(0, split[4].Length - 1);
+                                split = split[4].Split(":");
+                                if (split != null)
+                                {
+                                    if (split.Length == 2)
+                                    {
+                                        if (split[0].Equals(txtHostName))
+                                        {
+                                            publickey = split[1];
+
+                                            if (verbose && !silent)
+                                            {
+                                                Console.ForegroundColor = ConsoleColor.DarkYellow;
+                                                Console.WriteLine($"Public Key: {publickey}");
+                                                Console.ResetColor();
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+            }
+            catch (Exception ex)
+            {
+
+            }
+
+            return publickey;
         }
     }
 }
