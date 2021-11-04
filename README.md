@@ -35,6 +35,15 @@ The nuget package is created into the ```./nupkg``` directory.
 
 Presently, the cli's capability is:
 
+- yatter microsite [options]
+- yatter cryptography [option]
+  - y@R App Content Creators, please note that the following CLI commands can be used to obtain the current public key for uploading user content to the app (you can remove or utilize -s (silent) or -v (verbose), according tou your need):
+    - ```yatter cryptography -g -u publickeys.yatr.me -n userupload -s```
+    - ```yatter cryptography -g -u publickeys.yatr.me -n userupload -v```
+    - ```yatter cryptography -g -u publickeys.yatr.me -n userupload -o "PublicKey.txt" -s```
+    - ```yatter cryptography -g -u publickeys.yatr.me -n userupload -o "PublicKey.txt" -v```
+    - Help: ```yatter cryptography -h```
+
 ```
 microsite
   The microsite command archives a local Yatter Microsite so that the archive can be transported, or unarchives an archived Yatter Microsite that has been transported. Standard usage: yatter microsite [options]
@@ -80,16 +89,14 @@ Options:
   -t, --textinput <t>           The cryptography command's switch to indicate text that will be encrypted in conjunction with the use of the switch -e (--encrypt); optional
   -f, --fileinput <f>           The cryptography command's switch to indicate text in the contents of a file that will be encrypted in conjunction with the use of the switch -e (--encrypt); optional. Path specified by -f (--fileinput) can be to a file in the 
                                 current directory, relative to the current directory, or absolute.
-  -g, --getpublickey            NOT IMPLEMENTED. The cryptography command's switch to indicate that it will use an HttpClient to get the public key in Base64 from a DNS TXT Record indicated by the switch -n (--dnstxtkey), at a URL indicated by the switch -u 
-                                (--url), or to get it from a public key server at a URL indicated by the switch -u (--url), and requiring a key id indicated by the switch -i (--id),  where a querystring appended to that url is in the format ?id=[id] and [id] 
-                                is Base64Encoded; optional. When using -u (--url) in conjunction with -i (--id), do not append the querystring, the command appends this internally.
+  -g, --getpublickey            The cryptography command's switch to indicate that it will use an HttpClient to get the public key in Base64 from a DNS TXT Record indicated by the switch -n (--dnstxtkey), at a URL indicated by the switch -u (--url), or to get 
+                                it from a public key server at a URL indicated by the switch -u (--url), and requiring a key id indicated by the switch -i (--id),  where a querystring appended to that url is in the format ?id=[id] and [id] is Base64Encoded; 
+                                optional. When using -u (--url) in conjunction with -i (--id), do not append the querystring, the command appends this internally.
   -u, --url                     The cryptography command's switch to indicate the URL that will be used in conjunction with -g (getpublickey).
-  -a, --anykeyfilename <a>      The cryptography command's switch to indicate the Base64 public or private key in the contents of the indicated filename that will be used in conjunction with the use of the switch -e (--encrypt), or the switch -d (--decrypt), 
-                                to encrypt, or decrypt, respectively; optional.
   -n, --dnstxtkey <n>           The cryptography command's switch to indicate the DNS TXT key that is used in conjunction with -g (--getpublickey) from a URL indicated by the switch -u (--url); optional. Cannot be used with -i (--id).
-  -i, --id <i>                  The cryptography command's switch to indicate the id that will be used in conjunction with the switch -g (--getpublickey); optional. Cannot be used with -n (--dnstxtkey).
-  -y, --tokenheaderkey <y>      The cryptography command's switch to indicate the header key, if required, of a -u (--url) that will be used in conjunction with the switch -i (--id); optional.
-  -z, --tokenheadervalue <z>    The cryptography command's switch to indicate the header value, if required, of a -u (--url) that will be used in conjunction with the switch -i (--id); optional.
+  -i, --id <i>                  NOT IMPLEMENTED. The cryptography command's switch to indicate the id that will be used in conjunction with the switch -g (--getpublickey); optional. Cannot be used with -n (--dnstxtkey).
+  -y, --tokenheaderkey <y>      NOT IMPLEMENTED. The cryptography command's switch to indicate the header key, if required, of a -u (--url) that will be used in conjunction with the switch -i (--id); optional.
+  -z, --tokenheadervalue <z>    NOT IMPLEMENTED. The cryptography command's switch to indicate the header value, if required, of a -u (--url) that will be used in conjunction with the switch -i (--id); optional.
   -o, --output <o>              The cryptography command's switch to indicate that output is to be placed as the contents of the file indicated; optional, if not specified, output will be written to console. Path can be to a file in the current directory, 
                                 relative to the current directory, or absolute.
   -v, --verbose                 Instructs the CLI to make verbose CLI comments as it executes.
