@@ -20,12 +20,12 @@ Copyright © 2021
 
 #### Global
 
-- ```dotnet tool install --global Yatter.Net.Tools.CLI --version 0.0.7```
+- ```dotnet tool install --global Yatter.Net.Tools.CLI --version 0.0.9```
 
 #### Local
 
 - ```dotnet new tool-manifest # if you are setting up this repo```
-- ```dotnet tool install --local Yatter.Net.Tools.CLI --version 0.0.7```
+- ```dotnet tool install --local Yatter.Net.Tools.CLI --version 0.0.9```
 
 ### Overview
 
