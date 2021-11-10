@@ -20,13 +20,14 @@ namespace Yatter.Net.Tools.CLI
                     silent = true;
                 }
             }
-            string versionString = "0.0.7";
+            string versionString = "0.0.10";
 
             string currentExecutionModule = string.Empty;
 
             List<string> primaryarguments = new List<string>();
             primaryarguments.Add("microsite");
             primaryarguments.Add("cryptography");
+            primaryarguments.Add("wasm");
 
             if (!silent)
             {
@@ -52,13 +53,19 @@ namespace Yatter.Net.Tools.CLI
             {
                 currentExecutionModule = "microsite";
 
-                response = await Microsite.Run(args, System.Environment.CurrentDirectory);
+                response = await Tools.CLI.Yatter.Microsite.Run(args, System.Environment.CurrentDirectory);
             }
             else if (args[0].Equals("cryptography"))
             {
                 currentExecutionModule = "cryptography";
 
                 response = await Cryptography.Run(args, System.Environment.CurrentDirectory, silent);
+            }
+            else if (args[0].Equals("wasm"))
+            {
+                currentExecutionModule = "wasm";
+
+                response = await Tools.CLI.Yatter.WasmSerializer.Run(args, System.Environment.CurrentDirectory, silent);
             }
             else
             {
@@ -73,12 +80,14 @@ namespace Yatter.Net.Tools.CLI
                     {
                         Console.Write($"[{primary}]");
                     }
+
                     Console.WriteLine();
                     Console.ResetColor();
                     Console.WriteLine("Try:");
                     Console.WriteLine(" yatter [enter]");
                     Console.WriteLine(" yatter microsite --help [enter]");
                     Console.WriteLine(" yatter cryptography --help [enter]");
+                    Console.WriteLine(" yatter wasm --help [enter]");
                     Console.WriteLine();
                 }
             }

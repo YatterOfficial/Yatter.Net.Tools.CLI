@@ -22,6 +22,11 @@ namespace Yatter.Net.Tools.CLI.Yatter
             Console.WriteLine("  yatter cryptography [options]");
             Console.WriteLine("  yatter cryptography --help");
             Console.WriteLine();
+            Console.WriteLine(" wasm");
+            Console.WriteLine("  yatter wasm [options]");
+            Console.WriteLine("  yatter wasm --help");
+            Console.WriteLine();
+
             Console.WriteLine("-------------");
 
             return 0;

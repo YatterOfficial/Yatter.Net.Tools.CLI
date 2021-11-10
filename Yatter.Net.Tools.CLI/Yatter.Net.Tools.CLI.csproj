@@ -3,7 +3,7 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net6.0</TargetFramework>
-    <PackageVersion>0.0.9</PackageVersion>
+    <PackageVersion>0.0.10</PackageVersion>
     <Authors>Anthony Harrison</Authors>
     <Copyright>Anthony Harrison</Copyright>
     <PackageIconUrl>https://avatars.githubusercontent.com/u/92665945</PackageIconUrl>
@@ -13,7 +13,7 @@
     <Owners>Anthony Harrison</Owners>
     <PackageProjectUrl>https://github.com/YatterOfficial/Yatter.Net.Tools.CLI</PackageProjectUrl>
     <PackageIcon>icon.png</PackageIcon>
-    <PackageReleaseNotes>Alpha Release. Added cryptography command.</PackageReleaseNotes>
+    <PackageReleaseNotes>Alpha Release. Completed cryptography -g (--getpublickey) to the extent of querying a DNS TXT record directly.</PackageReleaseNotes>
     <Summary>Yatter CLI for the automation of Yatter Content-Creation</Summary>
     <PackageTags>dotnet-new;tool;yatter</PackageTags>
     <Title>Yatter Dotnet CLI</Title>
@@ -38,10 +38,10 @@
     <None Include="icon.png" Pack="true" PackagePath="\" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Yatter.Net.Tools.CLI.Yatter\Yatter.Net.Tools.CLI.Yatter.csproj" />
+    <PackageReference Include="System.CommandLine" Version="2.0.0-beta1.21308.1" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="System.CommandLine" Version="2.0.0-beta1.21308.1" />
+    <ProjectReference Include="..\Yatter.Net.Tools.CLI.Yatter\Yatter.Net.Tools.CLI.Yatter.csproj" />
   </ItemGroup>
 </Project>
 
